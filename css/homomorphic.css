@@ -1,0 +1,18 @@
+.img_reducao {
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.slider_params {
+    margin-bottom: 1.5em;
+}
+
+.rodape{
+    font-size: 0.8em;
+}
+
+.escondido {
+    left : -25000px;
+    position: absolute;
+}
+
