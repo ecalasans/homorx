@@ -35,23 +35,24 @@
                     <p id="gamma_l_label">
                         \(\gamma_{L} = 0.0\)
                     </p>
-                    <div id="gamma_l" class="slider_params"></div>
+                    <input type="range" class="form-range" id="gamma_l"
+                           min="0" max="1" step="0.01" value="0">
                     <p id="gamma_h_label">
                         \(\gamma_{H} = 0.0\)
                     </p>
-                    <div id="gamma_h" class="slider_params"></div>
+                    <input type="range" class="form-range" id="gamma_h">
                     <p id="c_label">
                         \(c = 0.0 \)
                     </p>
-                    <div id="c_slider" class="slider_params"></div>
+                    <input type="range" class="form-range" id="c_slider">
                     <p id="d0_label">
                         \(D_{0} = 0.0\)
                     </p>
-                    <div id="d_zero" class="slider_params"></div>
+                    <input type="range" class="form-range" id="d0_slider">
                 </div>
                 <div class="col-md-5 col-lg-5">
                     <input type="file" id="rx_input" name="rx" class="escondido">
-                    <p id="loading" class="text-center">Carregando OpenCV.js ...</p>
+<!--                    <p id="loading" class="text-center">Carregando OpenCV.js ...</p>-->
                     <canvas id="img_canvas" class="img_reducao mx-auto d-block"></canvas>
                 </div>
             </div>
@@ -68,13 +69,12 @@
         <p class="rodape text-center pt-3">&copy;Desenvolvido por ECalasans 2021</p>
     </footer>
 
-    <script async onload="OpenCVready();" type="text/javascript"
-            src="js/opencv.js"></script>
-    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="index.js"></script>
+<!--    <script async onload="OpenCVready();" type="text/javascript"-->
+<!--            src="js/opencv.js"></script>-->
     <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src="js/homomorphic.js"></script>
+
+
 
 </body>
 </html>

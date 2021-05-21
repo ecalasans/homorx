@@ -170,7 +170,14 @@ function MakeFFT(imagem) {
     mag.convertTo(mag, cv.CV_8U);
     cv.normalize(mag, mag, 0, 255, cv.NORM_MINMAX);
 
+    //Cruza os quadrantes para mostrar
+    CrossQuads(mag);
+
     return mag;
+}
+
+function OpenCVReady() {
+    $("#loading").remove();
 }
 
 module.exports = {
@@ -180,5 +187,6 @@ module.exports = {
     ZeroUnpadding,
     PrepareToDFT,
     CrossQuads,
-    MakeFFT
+    MakeFFT,
+    OpenCVReady
 }

@@ -1,34 +1,7 @@
-let imagem;
-
-// Função para compor a meshgrid
-function MeshgridJS(xdim, ydim){
-    let x = new Array(xdim);
-    let y = new Array(xdim);
-
-    for (let i = 0; i < xdim; i++){
-        let temp1 = new Array(ydim);
-
-        for (let j = 0; j < ydim; j++){
-            temp1[j] = i;
-        }
-
-        x[i] = temp1;
-    }
-
-    for (let i = 0; i < xdim; i++){
-        let temp2 = new Array(ydim);
-
-        for (let j = 0; j < ydim; j++){
-            temp2[j] = j;
-        }
-
-        y[i] = temp2;
-    }
-
-    return [x, y];
-}
+const funcoes = require('js/funcoes');
 
 $(document).ready(function () {
+    let imagem;
 //////////////////////////
 //  Sliders
     $("#gamma_l").slider({
