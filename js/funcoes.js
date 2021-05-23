@@ -35,11 +35,12 @@ function MeshgridJS(xdim, ydim){
     };
 }
 
-//Função Gaussiana Modificaca
+// Função Gaussiana Modificaca
 function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     //Dimensões da imagem
-    let im_h = imagem.rows;
-    let im_w = imagem.cols;
+    //Calcula o tamanho ótimo para a FFT
+    let im_h = cv.getOptimalDFTSize(imagem.rows);
+    let im_w = cv.getOptimalDFTSize(imagem.cols);
 
     //Coordenadas do centro
     let u_c = im_h/2;
@@ -58,8 +59,9 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
 
     let H_uv = nd.zip_elems([multi_delta_gamma], (mij, i, j) => gamma_l + mij)
 
-    console.log(H_uv);
+    return H_uv
 }
+
 
 // Função para zero padding
 function ZeroPadding(imagem) {
@@ -147,6 +149,7 @@ function MakeFFT(imagem) {
 
     //Transforma a imagem numa matriz complexa
     let im_compl = PrepareToDFT(im_otim);
+    console.log("Dimensões da imagem otimizada para FFT:  ", im_otim.rows, im_otim.cols);
 
     //Calcula a FFT
     let im_fft = new cv.Mat();

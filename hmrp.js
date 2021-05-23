@@ -6,6 +6,7 @@ const $ = require('jquery-browserify');
 
 $(document).ready(function () {
     let imagem;
+    let dst;
 //////////////////////////
 //  Sliders
     document.getElementById("gamma_l").value = 0;
@@ -72,6 +73,11 @@ $(document).ready(function () {
         MathJax.typeset();
     });
 
+    $("#salvar").click(function () {
+        let huv = funcoes.GaussModif(0.85,3.5,3,2000,dst);
+        console.log(huv.shape);
+    })
+
 
     $("#rx_input").change(function (e) {
         imagem = document.getElementById("img_container");
@@ -81,7 +87,8 @@ $(document).ready(function () {
     //Carrega a imagem via OpenCV
     $("#img_container").load(function () {
         var mat = cv.imread(imagem);
-        var dst = new cv.Mat();
+        console.log("Dimensões da imagem original:  " + mat.rows, mat.cols);
+        dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
         let fft_imagem = funcoes.MakeFFT(dst);
         cv.imshow('img_canvas', fft_imagem);
