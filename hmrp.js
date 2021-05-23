@@ -8,11 +8,38 @@ $(document).ready(function () {
     let imagem;
 //////////////////////////
 //  Sliders
-    $("#gamma_l").value = 0;
+    document.getElementById("gamma_l").value = 0;
+    document.getElementById("gamma_h").value = 0;
+    document.getElementById("c_slider").value = 0;
+    document.getElementById("d0_slider").value = 0;
+
+    // Funcionamento dos sliders
+
     $("#gamma_l").change(function () {
-        var gammaL = this.value;
-        var texto = "\\(\\gamma_{L} = " + gammaL +"\\)";
+        let gammaL = this.value;
+        let texto = "\\(\\gamma_{L} = " + gammaL +"\\)";
         document.getElementById("gamma_l_label").innerHTML = texto;
+        MathJax.typeset();
+    });
+
+    $("#gamma_h").change(function () {
+        let gammaH = this.value;
+        let texto = "\\(\\gamma_{L} = " + gammaH +"\\)";
+        document.getElementById("gamma_h_label").innerHTML = texto;
+        MathJax.typeset();
+    });
+
+    $("#c_slider").change(function () {
+        let c = this.value;
+        let texto = "\\(\\gamma_{L} = " + c +"\\)";
+        document.getElementById("c_label").innerHTML = texto;
+        MathJax.typeset();
+    });
+
+    $("#d0_slider").change(function () {
+        let d0 = this.value;
+        let texto = "\\(\\gamma_{L} = " + d0 +"\\)";
+        document.getElementById("d0_label").innerHTML = texto;
         MathJax.typeset();
     });
 ///////////////////////////////
@@ -23,9 +50,25 @@ $(document).ready(function () {
 
     //Limpa os valores dos controles
     $("#limpar").click(function () {
-        document.getElementById("gamma_l").value = "0";
+        document.getElementById("gamma_l").value = 0;
+        document.getElementById("gamma_h").value = 0;
+        document.getElementById("c_slider").value = 0;
+        document.getElementById("d0_slider").value = 0;
+
         let texto = "\\(\\gamma_{L} = 0.0 "+"\\)";
         document.getElementById("gamma_l_label").innerHTML = texto;
+        MathJax.typeset();
+
+        texto = "\\(\\gamma_{H} = 0.0 "+"\\)";
+        document.getElementById("gamma_h_label").innerHTML = texto;
+        MathJax.typeset();
+
+        texto = "\\(c = 0.0 "+"\\)";
+        document.getElementById("c_label").innerHTML = texto;
+        MathJax.typeset();
+
+        texto = "\\(D_{0} = 0.0 "+"\\)";
+        document.getElementById("d0_label").innerHTML = texto;
         MathJax.typeset();
     });
 

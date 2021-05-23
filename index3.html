@@ -1,93 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Homomorphic RX</title>
-  <link rel="stylesheet" href="css/jquery-ui.min.css">
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/homomorphic.css">
+    <meta charset="UTF-8">
+    <title>Homomorphic RX</title>
+    <link rel="stylesheet" href="css/jquery-ui.min.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/homomorphic.css">
 
-  <!--    Includes para usar o TeX no html-->
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
-  <!--    Includes para meshgrid-->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
 <main>
-  <section class="titulo container">
-    <h1 class="text-center pt-3">Homomorphic RX</h1>
-    <div class="row">
-      <div class="col-md-2 col-lg-2"></div>
-      <div class="col-md-8 col-lg-8">
-        <p class="justify-content-center mt-3">Clique no botão Carregar para abrir uma imagem na tela.
-          Faça os ajustes necessários nos
-          controles até que você consiga visualizar bem o trajeto do PICC e a ponta.  Em seguida clique
-          Salvar para que os dados sejam enviados.
-          Clique em Limpar para retornar a imagem ao estado original.</p>
-      </div>
-      <div class="col-md-2 col-lg-2"></div>
-    </div>
-  </section>
-  <section class="imagem container">
-    <img id="img_container" class="escondido">
-    <div class="row mt-2">
-      <div class="col-lg-5 col-md-5">
-
-      </div>
-      <div class="col-md-2 col-lg-2"></div>
-      <div class="col-md-5 col-lg-5">
-        <input type="file" id="rx_input" name="rx" class="escondido">
-        <canvas id="img_canvas" class="img_reducao mx-auto d-block"></canvas>
-      </div>
-    </div>
-    <div class="row mt-2">
-      <div class="col-lg-2 col-md-2"></div>
-      <div class="col-md-8 col-lg-8">
-        <p id="gamma_l_label">
-          \(\gamma_{L} = 0.0\)
-        </p>
-        <input type="range" class="form-range" id="gamma_l" min="0" max="1" step="0.01">
-        <p id="gamma_h_label">
-          \(\gamma_{H} = 0.0\)
-        </p>
-        <input type="range" class="form-range" id="gamma_h">
-        <p id="c_label">
-          \(c = 0.0 \)
-        </p>
-        <input type="range" class="form-range" id="c_slider">
-        <p id="d0_label">
-          \(D_{0} = 0.0\)
-        </p>
-        <input type="range" class="form-range" id="d0_slider">
-        <div class="row mt-2">
-          <div class="col-lg-4 col-md-4 text-center">
-            <button type="button" id="carregar" class="btn
-                            btn-primary shadow-none">Carregar</button>
-          </div>
-          <div class="col-lg-4 col-md-4 text-center">
-            <button type="button" id="limpar" class="btn btn-danger
-                            shadow-none">Limpar</button>
-          </div>
-          <div class="col-lg-4 col-md-4 text-center">
-            <button type="button" id="salvar" class="btn btn-success
-                            shadow-none">Salvar</button>
-          </div>
+    <section class="titulo container">
+        <h1 class="text-center pt-3">Homomorphic RX</h1>
+        <div class="row">
+            <div class="col-md-2 col-lg-2"></div>
+            <div class="col-md-8 col-lg-8">
+                <p class="justify-content-center mt-3">Clique no botão Carregar para abrir uma imagem na tela.
+                    Faça os ajustes necessários nos
+                    controles até que você consiga visualizar bem o trajeto do PICC e a ponta.  Em seguida clique
+                    Salvar para que os dados sejam enviados.
+                    Clique em Limpar para retornar a imagem ao estado original.</p>
+            </div>
+            <div class="col-md-2 col-lg-2"></div>
         </div>
-      </div>
-      <div class="col-lg-2 col-md-2"></div>
-    </div>
-  </section>
+    </section>
+    <section class="imagem container">
+        <div class="row mt-2">
+            <div class="col-md-6 col-lg-6">
+                <img id="img_container" class="img_reducao mx-auto d-block">
+            </div>
+            <div class="col-md-6 col-lg-6">
+                <input type="file" id="rx_input" name="rx" class="escondido">
+                <!--                    <p id="loading" class="text-center">Carregando OpenCV.js ...</p>-->
+                <canvas id="img_canvas" class="img_reducao mx-auto d-block"></canvas>
+            </div>
+        </div>
+        <div class="row mt-1">
+            <div class="col-lg-12 col-md-12">
+                <p id="gamma_l_label">
+                    \(\gamma_{L} = 0.0\)
+                </p>
+                <input type="range" class="form-range" id="gamma_l"
+                       min="0" max="1" step="0.01" value="0">
+                <p id="gamma_h_label">
+                    \(\gamma_{H} = 0.0\)
+                </p>
+                <input type="range" class="form-range" id="gamma_h"
+                       min="1" max="10" step="0.1" value="1">
+                <p id="c_label">
+                    \(c = 0.0 \)
+                </p>
+                <input type="range" class="form-range" id="c_slider"
+                       min="0" max="10" step="0.1" value="0">
+                <p id="d0_label">
+                    \(D_{0} = 0.0\)
+                </p>
+                <input type="range" class="form-range" id="d0_slider"
+                       min="30" max="3000" step="1" value="30">
+            </div>
+        </div>
+        <div class="row mt-1 d-flex justify-content-center">
+            <div class="d-flex justify-content-around">
+                <button type="button" id="carregar" class="btn btn-primary shadow-none">Carregar</button>
+                <button type="button" id="limpar" class="btn btn-danger shadow-none">Limpar</button>
+                <button type="button" id="salvar" class="btn btn-success shadow-none">Salvar</button>
+            </div>
+        </div>
+    </section>
 </main>
 <footer class="container">
-  <p class="rodape text-center pt-3">&copy;Desenvolvido por ECalasans 2021</p>
+    <p class="rodape text-center pt-3">&copy;Desenvolvido por ECalasans 2021</p>
 </footer>
 
 <script src="index.js"></script>
 <!--    <script async onload="OpenCVready();" type="text/javascript"-->
 <!--            src="js/opencv.js"></script>-->
 <script src="js/bootstrap.min.js"></script>
-<!--    <script src="js/jquery.js"></script>-->
+
+
 
 </body>
 </html>

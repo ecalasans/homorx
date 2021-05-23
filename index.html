@@ -40,15 +40,18 @@
                     <p id="gamma_h_label">
                         \(\gamma_{H} = 0.0\)
                     </p>
-                    <input type="range" class="form-range" id="gamma_h">
+                    <input type="range" class="form-range" id="gamma_h"
+                           min="1" max="10" step="0.1" value="1">
                     <p id="c_label">
                         \(c = 0.0 \)
                     </p>
-                    <input type="range" class="form-range" id="c_slider">
+                    <input type="range" class="form-range" id="c_slider"
+                           min="0" max="10" step="0.1" value="0">
                     <p id="d0_label">
                         \(D_{0} = 0.0\)
                     </p>
-                    <input type="range" class="form-range" id="d0_slider">
+                    <input type="range" class="form-range" id="d0_slider"
+                           min="30" max="3000" step="1" value="30">
                 </div>
                 <div class="col-md-5 col-lg-5">
                     <input type="file" id="rx_input" name="rx" class="escondido">
