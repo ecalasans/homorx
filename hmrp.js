@@ -91,7 +91,12 @@ $(document).ready(function () {
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
         let fft_imagem = funcoes.MakeFFT(dst);
-        cv.imshow('img_canvas', fft_imagem);
+        let huv = funcoes.GaussModif(
+            0.45,
+            2.0,
+            4.0,
+            2503, dst);
+        cv.imshow('img_canvas', huv);
     });
 
 });
