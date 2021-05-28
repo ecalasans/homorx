@@ -3,64 +3,30 @@ const cv = require('./opencv');
 
 // Função para compor a meshgrid
 function MeshgridJS(xdim, ydim){
-    let x = new Array(xdim);
-    let y = new Array(xdim);
-    let x_dim = xdim;
-    let y_dim = ydim;
+    let u = new Array();
+    let v = new Array();
+    //let x_dim = xdim;
+    //let y_dim = ydim;
 
     for (let i = 0; i < xdim; i++){
-        let temp1 = new Array(ydim);
-
         for (let j = 0; j < ydim; j++){
-            temp1[j] = i;
+            u.push(i);
         }
-
-        x[i] = temp1;
     }
 
     for (let i = 0; i < xdim; i++){
-        let temp2 = new Array(ydim);
-
         for (let j = 0; j < ydim; j++){
-            temp2[j] = j;
+            v.push(j);
         }
-
-        y[i] = temp2;
     }
     return {
-        'x': x,
-        'y': y,
-        'u': x_dim,
-        'v': y_dim
+        'u': u,
+        'v': v
     };
 }
 
-// Função Gaussiana Modificaca
+//Função Gaussiana Modificaca
 function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
-    // //Dimensões da imagem
-    // //Calcula o tamanho ótimo para a FFT
-    // let im_h = cv.getOptimalDFTSize(imagem.rows);
-    // let im_w = cv.getOptimalDFTSize(imagem.cols);
-    //
-    // //Coordenadas do centro
-    // let u_c = im_h/2;
-    // let v_c = im_w/2;
-    //
-    // //Matriz de Coordenadas
-    // let arr = MeshgridJS(im_h,im_w);
-    // let a = arr['x'];
-    // let b = arr['y'];
-    //
-    // //Etapas de cálculo de H(u,v)
-    // let d_uv_2_d0 = nd.zip_elems([a,b], (u, v, i, j) => (((u-u_c)**2 + (v-v_c)**2)**2) / D0);
-    // let um_menos = nd.zip_elems([d_uv_2_d0], (hij,i,j) => (Math.exp((-1) * c * hij)));
-    // let expon = nd.zip_elems([um_menos], (mij, i, j) => 1 - mij);
-    // let multi_delta_gamma = nd.zip_elems([expon], (mij, i, j) => (gamma_h - gamma_l) * mij);
-    //
-    // let H_uv = nd.zip_elems([multi_delta_gamma], (mij, i, j) => gamma_l + mij)
-    //
-    // return H_uv
-
     //Calcula o tamanho ótimo para a FFT
     let im_h = cv.getOptimalDFTSize(imagem.rows);
     let im_w = cv.getOptimalDFTSize(imagem.cols);
@@ -82,12 +48,7 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     let b = arr['v'];
     b = cv.matFromArray(im_h, im_w, cv.CV_32F, b);
 
-    // Matriz do filtro gaussiano modificado
-    let H_uv = new cv.Mat.zeros(im_h, im_w, cv.CV_32F);
-
-
     //Etapas de cálculo de H(u,v)
-    // let d_uv_2_d0 = nd.zip_elems([a, b], (u, v, i, j) => (((u-u_c)**2 + (v-v_c)**2)**2) / D0);
     // 1.  Cálculo de D(u,v)/D0
     let u_uc = new cv.Mat();
     let v_vc = new cv.Mat();
@@ -108,26 +69,60 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     u_uc.delete();
     v_vc.delete();
 
-    // Divisão por D0
+    // Divisão por D0^2
     let d_d0 = new cv.Mat();
+    cv.multiply(m_d0, m_d0, m_d0);
     cv.divide(soma_uuc_vvc_2, m_d0, d_d0);
     soma_uuc_vvc_2.delete();
     m_d0.delete();
 
-    // a.delete(); b.delete();
-    // let um_menos = nd.zip_elems([d_uv_2_d0], (hij,i,j) => (Math.exp((-1) * c * hij)));
-    //
-    // let expon = nd.zip_elems([um_menos], (mij, i, j) => 1 - mij);
-    //
-    // let multi_delta_gamma = nd.zip_elems([expon], (mij, i, j) => (gamma_h - gamma_l) * mij);
-    //
-    // let H_uv = nd.zip_elems([multi_delta_gamma], (mij, i, j) => gamma_l + mij)
+    // 2.  Cálculo de -c * d_d0
+    let menos_um = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(-1));
+    let menos_c = new cv.Mat();
 
-    let m_huv = new cv.Mat.zeros(im_h, im_w, cv.CV_8U);
+    // -c
+    cv.multiply(menos_um, m_c, menos_c);
 
-    console.log(d_d0.data32F);
+    cv.multiply(d_d0, menos_c, menos_c);
+    menos_um.delete();
+    d_d0.delete();
+    m_c.delete();
 
-    return d_d0;
+    // 3.  Cálculo de 1 - exp(menos_c)
+    // Matriz de "uns"
+    let um = new cv.Mat.ones(im_h, im_w, cv.CV_32F);
+
+    // Exponencial
+    let exponencial = new cv.Mat();
+    cv.exp(menos_c, exponencial);
+    menos_c.delete()
+
+    // 1 - exponencial
+    let um_menos_exp = new cv.Mat();
+    cv.subtract(um, exponencial, um_menos_exp);
+    exponencial.delete();
+    um.delete();
+
+    // 4.  Cálculo de H(u,v)
+    let m_gamma_l = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(gamma_l));
+    let m_gamma_h = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(gamma_h));
+    let gh_gl = new cv.Mat();
+
+    // gamma_h - gamma_l
+    cv.subtract(m_gamma_h, m_gamma_l, gh_gl);
+
+    // m_uv = (um_menos_exp * gh_gl) + gamma_l
+    let m_huv = new cv.Mat();
+    cv.multiply(gh_gl, um_menos_exp, gh_gl);
+    cv.add(gh_gl, m_gamma_l, m_huv);
+    m_gamma_l.delete();
+    m_gamma_h.delete();
+    gh_gl.delete();
+    um_menos_exp.delete();
+
+    console.log(m_huv);
+
+    return m_huv;
 }
 
 
