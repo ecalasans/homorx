@@ -106,6 +106,7 @@ $(document).ready(function () {
 
     //Limpa os valores dos controles
     $("#limpar").click(function () {
+        //  Restaura o valor dos controles**
         document.getElementById("gamma_l").value = gamma_l;
         document.getElementById("gamma_h").value = gamma_h;
         document.getElementById("c_slider").value = c;
@@ -126,6 +127,18 @@ $(document).ready(function () {
         texto = "\\(D_{0} = 30 "+"\\)";
         document.getElementById("d0_label").innerHTML = texto;
         MathJax.typeset();
+
+        // Restaura a imagem
+        huv = funcoes.GaussModif(
+            parseFloat(gl_slider.value),
+            parseFloat(gh_slider.value),
+            parseFloat(c_slider.value),
+            parseFloat(d0_slider.value),
+            dst
+        );
+
+        cv.imshow('img_canvas', huv);
+        huv.delete();
     });
 
     $("#rx_input").change(function (e) {
