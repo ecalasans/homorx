@@ -120,8 +120,6 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     gh_gl.delete();
     um_menos_exp.delete();
 
-    console.log(m_huv);
-
     return m_huv;
 }
 

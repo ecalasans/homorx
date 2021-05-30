@@ -8,6 +8,7 @@ $(document).ready(function () {
 //  Variáveis e constantes iniciais
     let imagem;
     let dst;
+    let huv;
 
     let gamma_l = 0.01;
     let gamma_h = 1.0;
@@ -29,33 +30,73 @@ $(document).ready(function () {
     // Funcionamento dos sliders
 
     $("#gamma_l").change(function () {
-        let gammaL = this.value;
-        let texto = "\\(\\gamma_{L} = " + gammaL +"\\)";
+        let texto = "\\(\\gamma_{L} = " + this.value +"\\)";
         document.getElementById("gamma_l_label").innerHTML = texto;
         MathJax.typeset();
 
-        console.log(gl_slider.value, gh_slider.value, c_slider.value, d0_slider.value);
+        huv = funcoes.GaussModif(
+            parseFloat(gl_slider.value),
+            parseFloat(gh_slider.value),
+            parseFloat(c_slider.value),
+            parseFloat(d0_slider.value),
+            dst
+        );
+
+        cv.imshow('img_canvas', huv);
+        huv.delete();
+
     });
 
     $("#gamma_h").change(function () {
-        let gammaH = this.value;
-        let texto = "\\(\\gamma_{L} = " + gammaH +"\\)";
+        let texto = "\\(\\gamma_{H} = " + this.value +"\\)";
         document.getElementById("gamma_h_label").innerHTML = texto;
         MathJax.typeset();
+
+        huv = funcoes.GaussModif(
+            parseFloat(gl_slider.value),
+            parseFloat(gh_slider.value),
+            parseFloat(c_slider.value),
+            parseFloat(d0_slider.value),
+            dst
+        );
+
+        cv.imshow('img_canvas', huv);
+        huv.delete();
     });
 
     $("#c_slider").change(function () {
-        let c = this.value;
-        let texto = "\\(\\gamma_{L} = " + c +"\\)";
+        let texto = "\\(c = " + this.value +"\\)";
         document.getElementById("c_label").innerHTML = texto;
         MathJax.typeset();
+
+        huv = funcoes.GaussModif(
+            parseFloat(gl_slider.value),
+            parseFloat(gh_slider.value),
+            parseFloat(c_slider.value),
+            parseFloat(d0_slider.value),
+            dst
+        );
+
+        cv.imshow('img_canvas', huv);
+        huv.delete();
     });
 
     $("#d0_slider").change(function () {
         let d0 = this.value;
-        let texto = "\\(\\gamma_{L} = " + d0 +"\\)";
+        let texto = "\\(D_{0} = " + d0 +"\\)";
         document.getElementById("d0_label").innerHTML = texto;
         MathJax.typeset();
+
+        huv = funcoes.GaussModif(
+            parseFloat(gl_slider.value),
+            parseFloat(gh_slider.value),
+            parseFloat(c_slider.value),
+            parseFloat(d0_slider.value),
+            dst
+        );
+
+        cv.imshow('img_canvas', huv);
+        huv.delete();
     });
 ///////////////////////////////
     //Abre a caixa de diálogo para selecionar imagem
