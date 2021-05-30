@@ -5,14 +5,26 @@ const $ = require('jquery-browserify');
 
 
 $(document).ready(function () {
+//  Variáveis e constantes iniciais
     let imagem;
     let dst;
+
+    let gamma_l = 0.01;
+    let gamma_h = 1.0;
+    let c = 0.0;
+    let d0 = 30;
 //////////////////////////
 //  Sliders
-    document.getElementById("gamma_l").value = 0;
-    document.getElementById("gamma_h").value = 0;
-    document.getElementById("c_slider").value = 0;
-    document.getElementById("d0_slider").value = 0;
+    let gl_slider = document.getElementById("gamma_l");
+    let gh_slider = document.getElementById("gamma_h");
+    let c_slider = document.getElementById("c_slider");
+    let d0_slider = document.getElementById("d0_slider");
+
+    //  Inicialização dos sliders
+    gl_slider.value = gamma_l;
+    gh_slider.value = gamma_h;
+    c_slider.value = c;
+    d0_slider.value = d0;
 
     // Funcionamento dos sliders
 
@@ -21,6 +33,8 @@ $(document).ready(function () {
         let texto = "\\(\\gamma_{L} = " + gammaL +"\\)";
         document.getElementById("gamma_l_label").innerHTML = texto;
         MathJax.typeset();
+
+        console.log(gl_slider.value, gh_slider.value, c_slider.value, d0_slider.value);
     });
 
     $("#gamma_h").change(function () {
@@ -51,16 +65,16 @@ $(document).ready(function () {
 
     //Limpa os valores dos controles
     $("#limpar").click(function () {
-        document.getElementById("gamma_l").value = 0;
-        document.getElementById("gamma_h").value = 0;
-        document.getElementById("c_slider").value = 0;
-        document.getElementById("d0_slider").value = 0;
+        document.getElementById("gamma_l").value = gamma_l;
+        document.getElementById("gamma_h").value = gamma_h;
+        document.getElementById("c_slider").value = c;
+        document.getElementById("d0_slider").value = d0;
 
-        let texto = "\\(\\gamma_{L} = 0.0 "+"\\)";
+        let texto = "\\(\\gamma_{L} = 0.01 "+"\\)";
         document.getElementById("gamma_l_label").innerHTML = texto;
         MathJax.typeset();
 
-        texto = "\\(\\gamma_{H} = 0.0 "+"\\)";
+        texto = "\\(\\gamma_{H} = 1.0 "+"\\)";
         document.getElementById("gamma_h_label").innerHTML = texto;
         MathJax.typeset();
 
@@ -68,16 +82,10 @@ $(document).ready(function () {
         document.getElementById("c_label").innerHTML = texto;
         MathJax.typeset();
 
-        texto = "\\(D_{0} = 0.0 "+"\\)";
+        texto = "\\(D_{0} = 30 "+"\\)";
         document.getElementById("d0_label").innerHTML = texto;
         MathJax.typeset();
     });
-
-    $("#salvar").click(function () {
-        let huv = funcoes.GaussModif(0.85,3.5,3,2000,dst);
-        console.log(huv.shape);
-    })
-
 
     $("#rx_input").change(function (e) {
         imagem = document.getElementById("img_container");
@@ -92,10 +100,10 @@ $(document).ready(function () {
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
         let fft_imagem = funcoes.MakeFFT(dst);
         let huv = funcoes.GaussModif(
-            0.45,
-            2.0,
-            4.0,
-            2503, dst);
+            gamma_l,
+            gamma_h,
+            c,
+            d0, dst);
         cv.imshow('img_canvas', huv);
     });
 
