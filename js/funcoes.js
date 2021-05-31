@@ -243,11 +243,14 @@ function ApplyHomomorphic(huv, image) {
     // Troca os quadrantes de huv
     CrossQuads(huv);
 
+    // Faz o Zero Padding
+    let z_padded = ZeroPadding(image);
+
     // Calcula o logaritmo da imagem - adiciona-se 1 para evitar a indefinição de ln 0
-    let um = new cv.Mat.ones(image.rows, image.cols, image.type());
+    let um = new cv.Mat.ones(z_padded.rows, z_padded.cols, z_padded.type());
     let um_add = new cv.Mat();
     let im_logs = new cv.Mat();
-    cv.add(um, image, um_add);
+    cv.add(um, z_padded, um_add);
     um.delete();
 
     um_add.convertTo(im_logs, cv.CV_32F);
@@ -255,6 +258,7 @@ function ApplyHomomorphic(huv, image) {
     cv.log(im_logs, im_logs);
 
     //Aplica a transformada e extrai o espectro
+    //TODO PAREI AQUI
     let imfft = new cv.Mat();
     cv.dft(im_logs, imfft, cv.DFT_COMPLEX_OUTPUT);
 
@@ -262,17 +266,16 @@ function ApplyHomomorphic(huv, image) {
     let componentes = new cv.MatVector();
     cv.split(imfft, componentes);
     let re = componentes.get(0);
+    let im = componentes.get(1);
 
-    componentes.delete();
+    // huv * parte real de imfft
+    let m_re = new cv.matFromArray(z_padded.rows, z_padded.cols, cv.CV_32F, re);
+    let im_filtrada = new cv.Mat();
 
-    // Cria uma matriz para a parte real
-    let m_re = new cv.matFromArray(image.rows, image.cols, cv.CV_32F, re);
+    console.log("huv: " ,huv.rows , huv.cols);
+    console.log('mre: ' , m_re.rows , m_re.cols);
 
-    // huv * m_re
-    let filtragem = new cv.Mat();
-    cv.multiply(huv, m_re, filtragem);
-
-    return filtragem;
+    return m_re;
 }
 
 module.exports = {

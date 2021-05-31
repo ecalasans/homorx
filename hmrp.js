@@ -9,6 +9,7 @@ $(document).ready(function () {
     let imagem;
     let dst;
     let huv;
+    let fft_imagem;
 
     let gamma_l = 0.01;
     let gamma_h = 1.0;
@@ -77,7 +78,9 @@ $(document).ready(function () {
             dst
         );
 
-        cv.imshow('img_canvas', huv);
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+
+        cv.imshow('img_canvas', fft_imagem);
         huv.delete();
     });
 
@@ -95,7 +98,9 @@ $(document).ready(function () {
             dst
         );
 
-        cv.imshow('img_canvas', huv);
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+
+        //cv.imshow('img_canvas', fft_imagem);
         huv.delete();
     });
 ///////////////////////////////
@@ -152,7 +157,6 @@ $(document).ready(function () {
         console.log("Dimensões da imagem original:  " + mat.rows, mat.cols);
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
-        let fft_imagem = new cv.Mat();
         let huv = funcoes.GaussModif(
             gamma_l,
             gamma_h,
@@ -161,7 +165,9 @@ $(document).ready(function () {
 
         fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
-        console.log(fft_imagem);
+        //console.log(fft_imagem);
+
+        cv.imshow('img_canvas', fft_imagem);
 
     });
 
