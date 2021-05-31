@@ -246,11 +246,14 @@ function ApplyHomomorphic(huv, image) {
     // Faz o Zero Padding
     let z_padded = ZeroPadding(image);
 
+    // Prepara a imagem para a fft
+    let im_complexa = PrepareToDFT(z_padded);
+
     // Calcula o logaritmo da imagem - adiciona-se 1 para evitar a indefinição de ln 0
-    let um = new cv.Mat.ones(z_padded.rows, z_padded.cols, z_padded.type());
+    let um = new cv.Mat.ones(im_complexa.rows, im_complexa.cols, im_complexa.type());
     let um_add = new cv.Mat();
     let im_logs = new cv.Mat();
-    cv.add(um, z_padded, um_add);
+    cv.add(um, im_complexa, um_add);
     um.delete();
 
     um_add.convertTo(im_logs, cv.CV_32F);
@@ -258,7 +261,6 @@ function ApplyHomomorphic(huv, image) {
     cv.log(im_logs, im_logs);
 
     //Aplica a transformada e extrai o espectro
-    //TODO PAREI AQUI
     let imfft = new cv.Mat();
     cv.dft(im_logs, imfft, cv.DFT_COMPLEX_OUTPUT);
 
@@ -267,15 +269,28 @@ function ApplyHomomorphic(huv, image) {
     cv.split(imfft, componentes);
     let re = componentes.get(0);
     let im = componentes.get(1);
+    componentes.delete();
 
-    // huv * parte real de imfft
-    let m_re = new cv.matFromArray(z_padded.rows, z_padded.cols, cv.CV_32F, re);
+    // huv * imfft - multiplicação da parte real e imaginária
+    let m_re = new cv.matFromArray(imfft.rows, imfft.cols, cv.CV_32F, re);
+    let m_im = new cv.matFromArray(imfft.rows, imfft.cols, cv.CV_32F, im);
     let im_filtrada = new cv.Mat();
+    cv.multiply(huv, m_re, m_re);
+    cv.multiply(huv, m_im, m_im);
+
+    // Reconstrói a imagem complexa
+    let im_vetor = new cv.MatVector();
+    im_vetor.push_back(m_re);
+    im_vetor.push_back(m_im);
+    cv.merge(im_vetor, im_filtrada);
 
     console.log("huv: " ,huv.rows , huv.cols);
     console.log('mre: ' , m_re.rows , m_re.cols);
+    console.log('im_filtrada:  ', im_filtrada.rows, im_filtrada.cols);
 
-    return m_re;
+    console.log('im_filtrada', im_filtrada);
+
+    return im_logs;
 }
 
 module.exports = {

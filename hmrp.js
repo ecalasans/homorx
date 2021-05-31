@@ -167,7 +167,7 @@ $(document).ready(function () {
 
         //console.log(fft_imagem);
 
-        cv.imshow('img_canvas', fft_imagem);
+        //cv.imshow('img_canvas', fft_imagem);
 
     });
 
