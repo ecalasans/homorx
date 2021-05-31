@@ -1,4 +1,3 @@
-//const nd = require('nd4js');
 const cv = require('./opencv');
 
 // Função para compor a meshgrid
@@ -123,7 +122,6 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     return m_huv;
 }
 
-
 // Função para zero padding
 function ZeroPadding(imagem) {
     //Calcula o tamanho ótimo para a FFT
@@ -240,8 +238,41 @@ function MakeFFT(imagem) {
     return mag;
 }
 
-function OpenCVReady() {
-    $("#loading").remove();
+// Função para aplicação do filtro homomórfico propriamente dito
+function ApplyHomomorphic(huv, image) {
+    // Troca os quadrantes de huv
+    CrossQuads(huv);
+
+    // Calcula o logaritmo da imagem - adiciona-se 1 para evitar a indefinição de ln 0
+    let um = new cv.Mat.ones(image.rows, image.cols, image.type());
+    let um_add = new cv.Mat();
+    let im_logs = new cv.Mat();
+    cv.add(um, image, um_add);
+    um.delete();
+
+    um_add.convertTo(im_logs, cv.CV_32F);
+    um_add.delete();
+    cv.log(im_logs, im_logs);
+
+    //Aplica a transformada e extrai o espectro
+    let imfft = new cv.Mat();
+    cv.dft(im_logs, imfft, cv.DFT_COMPLEX_OUTPUT);
+
+    //Separa a parte real e imaginária da matriz complexa
+    let componentes = new cv.MatVector();
+    cv.split(imfft, componentes);
+    let re = componentes.get(0);
+
+    componentes.delete();
+
+    // Cria uma matriz para a parte real
+    let m_re = new cv.matFromArray(image.rows, image.cols, cv.CV_32F, re);
+
+    // huv * m_re
+    let filtragem = new cv.Mat();
+    cv.multiply(huv, m_re, filtragem);
+
+    return filtragem;
 }
 
 module.exports = {
@@ -252,5 +283,5 @@ module.exports = {
     PrepareToDFT,
     CrossQuads,
     MakeFFT,
-    OpenCVReady
+    ApplyHomomorphic
 }

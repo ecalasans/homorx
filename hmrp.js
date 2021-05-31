@@ -152,13 +152,17 @@ $(document).ready(function () {
         console.log("Dimensões da imagem original:  " + mat.rows, mat.cols);
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
-        let fft_imagem = funcoes.MakeFFT(dst);
+        let fft_imagem = new cv.Mat();
         let huv = funcoes.GaussModif(
             gamma_l,
             gamma_h,
             c,
             d0, dst);
-        cv.imshow('img_canvas', huv);
+
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+
+        console.log(fft_imagem);
+
     });
 
 });
