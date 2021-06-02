@@ -239,15 +239,8 @@ function MakeFFT(imagem) {
 
 // Função para detectar NaN
 function DetectIsNan(imagem){
-    for(let i = 0; i < imagem.rows; i++){
-        for (let j = 0; j < imagem.cols; j++) {
-            if(isNaN(imagem.floatAt(i, j))){
-                alert('Achei!!');
-            } else {
-                continue;
-            }
-        }
-    }
+    console.log('data: ', imagem.ucharAt(0,0));
+    console.log('data32F: ', imagem.floatAt(0,0))
 }
 
 // Função para aplicação do filtro homomórfico propriamente dito
@@ -267,23 +260,27 @@ function ApplyHomomorphic(huv, image) {
 
     // Calcula a IFFT
     let im_ifft = PrepareToDFT(im_filtragem);
-    cv.dft(im_ifft, im_ifft, cv.DFT_INVERSE);
+    let ifft_res = new cv.Mat();
+    cv.dft(im_ifft, ifft_res, cv.DFT_INVERSE);
 
     // Calcula o espectro da IDFT
     let im_ifft_espectro = new cv.Mat();
     let componentes = new cv.MatVector();
-    cv.split(im_ifft, componentes);
+    cv.split(ifft_res, componentes);
     cv.magnitude(componentes.get(0), componentes.get(1), im_ifft_espectro);
     //componentes.delete();
 
+    //TODO O PROBLEMA ESTÁ AQUI
     // Inverte a operação de logaritmo aplicando a exponencial
     let im_exp = new cv.Mat();
     cv.exp(im_ifft_espectro, im_exp);
+
 
     // Subtrai 1 adicionado pela função MakeFFT(vide implementação)
     let M_um = new cv.Mat.ones(im_exp.rows, im_exp.cols, cv.CV_32F);
     let im_menos_um = new cv.Mat();
     cv.subtract(im_exp, M_um, im_menos_um);
+    DetectIsNan(im_menos_um);
 
     // Normaliza a imagem para o intervalo entre 0 e 255
     cv.normalize(im_menos_um, im_menos_um, 0, 255, cv.NORM_MINMAX);
@@ -298,13 +295,13 @@ function ApplyHomomorphic(huv, image) {
     // console.log('huv:  ', huv.rows, huv.cols, huv.channels(), huv.type());
     // console.log('im_fft_espectro: ', im_fft_espectro.rows,
     //     im_fft_espectro.cols, im_fft_espectro.channels(), im_fft_espectro.type());
-    // console.log('im_filtragem:', im_filtragem.rows, im_filtragem.cols,
+    // console.log('im_filtragem:', im_filtragem, im_filtragem.rows, im_filtragem.cols,
     //     im_filtragem.channels(), im_filtragem.type());
     // console.log('im_ifft:', im_ifft.rows, im_ifft.cols, im_ifft.channels(), im_ifft.type());
     // console.log('im_ifft_espectro:', im_ifft_espectro.rows, im_ifft_espectro.cols,
     //     im_ifft_espectro.channels(), im_ifft_espectro.type());
-    // console.log('im_exp:  ', im_exp.rows, im_exp.cols, im_exp.channels(), im_exp.type());
-    // console.log('im_menos_um:  ', im_menos_um.rows, im_menos_um.cols,
+    // console.log('im_exp:  ', im_exp, im_exp.rows, im_exp.cols, im_exp.channels(), im_exp.type());
+    // console.log('im_menos_um:  ', im_menos_um, im_menos_um.rows, im_menos_um.cols,
     //     im_menos_um.channels(), im_menos_um.type());
     // // console.log('im_final:', im_final.rows, im_final.cols, im_final.channels(), im_final.type());
     console.log(im_menos_um);
