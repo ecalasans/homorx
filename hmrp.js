@@ -10,6 +10,7 @@ $(document).ready(function () {
     let dst;
     let huv;
     let fft_imagem;
+    let imagem_filtrada;
 
     let gamma_l = 0.01;
     let gamma_h = 1.0;
@@ -43,8 +44,11 @@ $(document).ready(function () {
             dst
         );
 
-        cv.imshow('img_canvas', huv);
-        huv.delete();
+        //fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+
+        //funcoes.CrossQuads(huv);
+        cv.imshow('huv_canvas', huv);
+        //cv.imshow('img_canvas', fft_imagem);
 
     });
 
@@ -61,8 +65,11 @@ $(document).ready(function () {
             dst
         );
 
-        cv.imshow('img_canvas', huv);
-        huv.delete();
+       // fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+
+        //funcoes.CrossQuads(huv);
+        cv.imshow('huv_canvas', huv);
+        //cv.imshow('img_canvas', fft_imagem);
     });
 
     $("#c_slider").change(function () {
@@ -78,10 +85,11 @@ $(document).ready(function () {
             dst
         );
 
-        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        //fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
-        cv.imshow('img_canvas', fft_imagem);
-        huv.delete();
+        //funcoes.CrossQuads(huv);
+        cv.imshow('huv_canvas', huv);
+        //cv.imshow('img_canvas', fft_imagem);
     });
 
     $("#d0_slider").change(function () {
@@ -98,10 +106,11 @@ $(document).ready(function () {
             dst
         );
 
-        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        //fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
+        //funcoes.CrossQuads(huv);
+        cv.imshow('huv_canvas', huv);
         //cv.imshow('img_canvas', fft_imagem);
-        huv.delete();
     });
 ///////////////////////////////
     //Abre a caixa de diálogo para selecionar imagem
@@ -163,11 +172,11 @@ $(document).ready(function () {
             c,
             d0, dst);
 
-        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.MakeFFT(dst);
+        imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
 
-        //console.log(fft_imagem);
-
-        //cv.imshow('img_canvas', fft_imagem);
+        cv.imshow('huv_canvas', huv);
+        cv.imshow('img_canvas', fft_imagem['espectro']);
 
     });
 

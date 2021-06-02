@@ -208,7 +208,6 @@ function MakeFFT(imagem) {
 
     //Transforma a imagem numa matriz complexa
     let im_compl = PrepareToDFT(im_otim);
-    console.log("Dimensões da imagem otimizada para FFT:  ", im_otim.rows, im_otim.cols);
 
     //Calcula a FFT
     let im_fft = new cv.Mat();
@@ -235,62 +234,80 @@ function MakeFFT(imagem) {
     //Cruza os quadrantes para mostrar
     CrossQuads(mag);
 
-    return mag;
+    return {'espectro': mag, 'fft' : im_fft}
+}
+
+// Função para detectar NaN
+function DetectIsNan(imagem){
+    for(let i = 0; i < imagem.rows; i++){
+        for (let j = 0; j < imagem.cols; j++) {
+            if(isNaN(imagem.floatAt(i, j))){
+                alert('Achei!!');
+            } else {
+                continue;
+            }
+        }
+    }
 }
 
 // Função para aplicação do filtro homomórfico propriamente dito
 function ApplyHomomorphic(huv, image) {
-    // Troca os quadrantes de huv
-    CrossQuads(huv);
+    // Calcula a FFT - Vide função MakeFFT
+    let im_fft = MakeFFT(image);
+    let im_fft_espectro = im_fft['espectro'];
+    //im_fft.delete();
 
-    // Faz o Zero Padding
-    let z_padded = ZeroPadding(image);
+    // Converte o espectro para o tipo de huv(float)
+    im_fft_espectro.convertTo(im_fft_espectro, huv.type());
 
-    // Prepara a imagem para a fft
-    let im_complexa = PrepareToDFT(z_padded);
+    // huv * im_fft_espectro
+    let im_filtragem = new cv.Mat();
+    cv.multiply(huv, im_fft_espectro, im_filtragem);
+    //im_fft_espectro.delete();
 
-    // Calcula o logaritmo da imagem - adiciona-se 1 para evitar a indefinição de ln 0
-    let um = new cv.Mat.ones(im_complexa.rows, im_complexa.cols, im_complexa.type());
-    let um_add = new cv.Mat();
-    let im_logs = new cv.Mat();
-    cv.add(um, im_complexa, um_add);
-    um.delete();
+    // Calcula a IFFT
+    let im_ifft = PrepareToDFT(im_filtragem);
+    cv.dft(im_ifft, im_ifft, cv.DFT_INVERSE);
 
-    um_add.convertTo(im_logs, cv.CV_32F);
-    um_add.delete();
-    cv.log(im_logs, im_logs);
-
-    //Aplica a transformada e extrai o espectro
-    let imfft = new cv.Mat();
-    cv.dft(im_logs, imfft, cv.DFT_COMPLEX_OUTPUT);
-
-    //Separa a parte real e imaginária da matriz complexa
+    // Calcula o espectro da IDFT
+    let im_ifft_espectro = new cv.Mat();
     let componentes = new cv.MatVector();
-    cv.split(imfft, componentes);
-    let re = componentes.get(0);
-    let im = componentes.get(1);
-    componentes.delete();
+    cv.split(im_ifft, componentes);
+    cv.magnitude(componentes.get(0), componentes.get(1), im_ifft_espectro);
+    //componentes.delete();
 
-    // huv * imfft - multiplicação da parte real e imaginária
-    let m_re = new cv.matFromArray(imfft.rows, imfft.cols, cv.CV_32F, re);
-    let m_im = new cv.matFromArray(imfft.rows, imfft.cols, cv.CV_32F, im);
-    let im_filtrada = new cv.Mat();
-    cv.multiply(huv, m_re, m_re);
-    cv.multiply(huv, m_im, m_im);
+    // Inverte a operação de logaritmo aplicando a exponencial
+    let im_exp = new cv.Mat();
+    cv.exp(im_ifft_espectro, im_exp);
 
-    // Reconstrói a imagem complexa
-    let im_vetor = new cv.MatVector();
-    im_vetor.push_back(m_re);
-    im_vetor.push_back(m_im);
-    cv.merge(im_vetor, im_filtrada);
+    // Subtrai 1 adicionado pela função MakeFFT(vide implementação)
+    let M_um = new cv.Mat.ones(im_exp.rows, im_exp.cols, cv.CV_32F);
+    let im_menos_um = new cv.Mat();
+    cv.subtract(im_exp, M_um, im_menos_um);
 
-    console.log("huv: " ,huv.rows , huv.cols);
-    console.log('mre: ' , m_re.rows , m_re.cols);
-    console.log('im_filtrada:  ', im_filtrada.rows, im_filtrada.cols);
+    // Normaliza a imagem para o intervalo entre 0 e 255
+    cv.normalize(im_menos_um, im_menos_um, 0, 255, cv.NORM_MINMAX);
 
-    console.log('im_filtrada', im_filtrada);
+    // // Converte em 8 bits para exibição
+    // let im_final = new cv.Mat();
+    //im_menos_um.convertTo(im_menos_um, cv.CV_8UC1);
 
-    return im_logs;
+    // Realiza o unpadding
+    // im_final = ZeroUnpadding(image, im_final);
+
+    // console.log('huv:  ', huv.rows, huv.cols, huv.channels(), huv.type());
+    // console.log('im_fft_espectro: ', im_fft_espectro.rows,
+    //     im_fft_espectro.cols, im_fft_espectro.channels(), im_fft_espectro.type());
+    // console.log('im_filtragem:', im_filtragem.rows, im_filtragem.cols,
+    //     im_filtragem.channels(), im_filtragem.type());
+    // console.log('im_ifft:', im_ifft.rows, im_ifft.cols, im_ifft.channels(), im_ifft.type());
+    // console.log('im_ifft_espectro:', im_ifft_espectro.rows, im_ifft_espectro.cols,
+    //     im_ifft_espectro.channels(), im_ifft_espectro.type());
+    // console.log('im_exp:  ', im_exp.rows, im_exp.cols, im_exp.channels(), im_exp.type());
+    // console.log('im_menos_um:  ', im_menos_um.rows, im_menos_um.cols,
+    //     im_menos_um.channels(), im_menos_um.type());
+    // // console.log('im_final:', im_final.rows, im_final.cols, im_final.channels(), im_final.type());
+    console.log(im_menos_um);
 }
 
 module.exports = {
