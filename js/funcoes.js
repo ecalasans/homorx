@@ -245,36 +245,9 @@ function DetectIsNan(imagem){
 
 // Função para aplicação do filtro homomórfico propriamente dito
 function ApplyHomomorphic(huv, image) {
-    // Calcula a FFT - Vide função MakeFFT
-    let im_fft = MakeFFT(image);
-    im_fft = im_fft['fft'];
+    // Somar 1 a imagem
 
-    // Troca os quadrantes
-    CrossQuads(im_fft);
 
-    // Transforma huv em uma matriz com 2 canais
-    let v_huv = new cv.MatVector();
-    let m_huv = new cv.Mat();
-    v_huv.push_back(huv);
-    v_huv.push_back(huv);
-    cv.merge(v_huv, m_huv);
-    v_huv.delete();
-
-    // m_huv * im_fft
-    let filtragem = new cv.Mat();
-    cv.multiply(m_huv, im_fft, filtragem);
-
-    // Inverte FFT
-    let im_ifft = new cv.Mat();
-    cv.dft(filtragem, im_ifft, cv.DFT_INVERSE);
-
-    // console.log('im_fft', im_fft, im_fft.rows,
-    //     im_fft.cols, im_fft.channels(), im_fft.type());
-    // console.log('huv', huv.rows, huv.cols, huv.channels(), huv.type());
-    // console.log('m_huv', m_huv, m_huv.rows, m_huv.cols, m_huv.channels(), m_huv.type());
-    console.log('filtragem ', filtragem, filtragem.rows, filtragem.cols,
-        filtragem.channels(), filtragem.type());
-    console.log('im_fft', im_ifft, im_ifft.rows, im_ifft.cols, im_ifft.channels(), im_ifft.type());
 }
 
 module.exports = {
