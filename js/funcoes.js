@@ -233,6 +233,7 @@ function MakeFFT(imagem) {
 
     //Cruza os quadrantes para mostrar
     CrossQuads(mag);
+    CrossQuads(im_fft);
 
     return {'espectro': mag, 'fft' : im_fft}
 }
@@ -243,9 +244,71 @@ function DetectIsNan(imagem){
     console.log('data32F: ', imagem.floatAt(0,0))
 }
 
+// Função para retornar parâmetros
+function VarParams(v) {
+    console.log(v.rows, v.cols, v.channels(), v.type());
+    console.log(v);
+}
+
 // Função para aplicação do filtro homomórfico propriamente dito
 function ApplyHomomorphic(huv, image) {
-    // Somar 1 a imagem
+    // Faz o padding com 0s
+    let z_padded = ZeroPadding(image);
+
+    // Soma 1s à imagem para evitar a indefinição do logaritmo
+    let uns = new cv.Mat.ones(z_padded.rows, z_padded.cols, z_padded.type());
+    cv.add(z_padded, uns, z_padded);
+
+    // Converte a imagem para float
+    z_padded.convertTo(z_padded, cv.CV_32F);
+    // console.log('z_padded');
+    // VarParams(z_padded);
+
+    // Aplica o logaritmo
+    let im_log = new cv.Mat();
+    cv.log(z_padded, im_log);
+    // console.log('im_log');
+    // VarParams(im_log);
+
+    // Prepara a imagem para a FFT(parte real e imaginária)
+    let im_fft = PrepareToFFT(im_log);
+    // console.log('im_fft');
+    // VarParams(im_fft);
+
+    // FFT
+    cv.dft(im_fft, im_fft, cv.DFT_COMPLEX_OUTPUT);
+    console.log('im_fft após fft');
+    VarParams(im_fft);
+
+    // Prepara huv para ser aplicado na filtragem - imagem complexa
+    let cross_huv = huv;
+    CrossQuads(cross_huv);
+    let v_huv = new cv.MatVector();
+    v_huv.push_back(cross_huv);
+    v_huv.push_back(cross_huv);
+    let m_huv = new cv.Mat();
+    cv.merge(v_huv, m_huv);
+    v_huv.delete();
+    console.log('m_huv');
+    VarParams(m_huv);
+
+    // Filtragem im_fft * m_huv
+    let im_filtrada = new cv.Mat();
+    cv.multiply(im_fft, m_huv, im_filtrada);
+    // console.log('im_filtrada');
+    // VarParams(im_filtrada);
+
+    // Inverte FFT
+    let im_ifft = new cv.Mat();
+    cv.dft(im_filtrada, im_ifft, cv.DFT_INVERSE);
+    // console.log('im_ifft')
+    // VarParams(im_ifft);
+
+    // Calcula a exponencial(inversão do logaritmo)
+    let im_exp = new cv.Mat();
+    cv.exp(im_ifft, im_exp);
+    console.log('im_exp');
+    VarParams(im_exp);
 
 
 }
