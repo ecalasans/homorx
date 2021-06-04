@@ -157,7 +157,7 @@ function ZeroUnpadding(imagem, padded_imagem) {
 }
 
 //Função para adaptar a matriz da imagem com um formato de matriz complexa(parte real e imaginária com valor 0i)
-function PrepareToDFT(padded_imagem){
+function PrepareToFFT(padded_imagem){
     let vetor = new cv.MatVector();
     let parte_real = new cv.Mat();
     padded_imagem.convertTo(parte_real, cv.CV_32F);
@@ -207,7 +207,7 @@ function MakeFFT(imagem) {
     let im_otim = ZeroPadding(imagem);
 
     //Transforma a imagem numa matriz complexa
-    let im_compl = PrepareToDFT(im_otim);
+    let im_compl = PrepareToFFT(im_otim);
 
     //Calcula a FFT
     let im_fft = new cv.Mat();
@@ -247,64 +247,34 @@ function DetectIsNan(imagem){
 function ApplyHomomorphic(huv, image) {
     // Calcula a FFT - Vide função MakeFFT
     let im_fft = MakeFFT(image);
-    let im_fft_espectro = im_fft['espectro'];
-    //im_fft.delete();
+    im_fft = im_fft['fft'];
 
-    // Converte o espectro para o tipo de huv(float)
-    im_fft_espectro.convertTo(im_fft_espectro, huv.type());
+    // Troca os quadrantes
+    CrossQuads(im_fft);
 
-    // huv * im_fft_espectro
-    let im_filtragem = new cv.Mat();
-    cv.multiply(huv, im_fft_espectro, im_filtragem);
-    //im_fft_espectro.delete();
+    // Transforma huv em uma matriz com 2 canais
+    let v_huv = new cv.MatVector();
+    let m_huv = new cv.Mat();
+    v_huv.push_back(huv);
+    v_huv.push_back(huv);
+    cv.merge(v_huv, m_huv);
+    v_huv.delete();
 
-    // Calcula a IFFT
-    let im_ifft = PrepareToDFT(im_filtragem);
-    let ifft_res = new cv.Mat();
-    cv.dft(im_ifft, ifft_res, cv.DFT_INVERSE);
+    // m_huv * im_fft
+    let filtragem = new cv.Mat();
+    cv.multiply(m_huv, im_fft, filtragem);
 
-    // Calcula o espectro da IDFT
-    let im_ifft_espectro = new cv.Mat();
-    let componentes = new cv.MatVector();
-    cv.split(ifft_res, componentes);
-    cv.magnitude(componentes.get(0), componentes.get(1), im_ifft_espectro);
-    //componentes.delete();
+    // Inverte FFT
+    let im_ifft = new cv.Mat();
+    cv.dft(filtragem, im_ifft, cv.DFT_INVERSE);
 
-    //TODO O PROBLEMA ESTÁ AQUI
-    // Inverte a operação de logaritmo aplicando a exponencial
-    let im_exp = new cv.Mat();
-    cv.exp(im_ifft_espectro, im_exp);
-
-
-    // Subtrai 1 adicionado pela função MakeFFT(vide implementação)
-    let M_um = new cv.Mat.ones(im_exp.rows, im_exp.cols, cv.CV_32F);
-    let im_menos_um = new cv.Mat();
-    cv.subtract(im_exp, M_um, im_menos_um);
-    DetectIsNan(im_menos_um);
-
-    // Normaliza a imagem para o intervalo entre 0 e 255
-    cv.normalize(im_menos_um, im_menos_um, 0, 255, cv.NORM_MINMAX);
-
-    // // Converte em 8 bits para exibição
-    // let im_final = new cv.Mat();
-    //im_menos_um.convertTo(im_menos_um, cv.CV_8UC1);
-
-    // Realiza o unpadding
-    // im_final = ZeroUnpadding(image, im_final);
-
-    // console.log('huv:  ', huv.rows, huv.cols, huv.channels(), huv.type());
-    // console.log('im_fft_espectro: ', im_fft_espectro.rows,
-    //     im_fft_espectro.cols, im_fft_espectro.channels(), im_fft_espectro.type());
-    // console.log('im_filtragem:', im_filtragem, im_filtragem.rows, im_filtragem.cols,
-    //     im_filtragem.channels(), im_filtragem.type());
-    // console.log('im_ifft:', im_ifft.rows, im_ifft.cols, im_ifft.channels(), im_ifft.type());
-    // console.log('im_ifft_espectro:', im_ifft_espectro.rows, im_ifft_espectro.cols,
-    //     im_ifft_espectro.channels(), im_ifft_espectro.type());
-    // console.log('im_exp:  ', im_exp, im_exp.rows, im_exp.cols, im_exp.channels(), im_exp.type());
-    // console.log('im_menos_um:  ', im_menos_um, im_menos_um.rows, im_menos_um.cols,
-    //     im_menos_um.channels(), im_menos_um.type());
-    // // console.log('im_final:', im_final.rows, im_final.cols, im_final.channels(), im_final.type());
-    console.log(im_menos_um);
+    // console.log('im_fft', im_fft, im_fft.rows,
+    //     im_fft.cols, im_fft.channels(), im_fft.type());
+    // console.log('huv', huv.rows, huv.cols, huv.channels(), huv.type());
+    // console.log('m_huv', m_huv, m_huv.rows, m_huv.cols, m_huv.channels(), m_huv.type());
+    console.log('filtragem ', filtragem, filtragem.rows, filtragem.cols,
+        filtragem.channels(), filtragem.type());
+    console.log('im_fft', im_ifft, im_ifft.rows, im_ifft.cols, im_ifft.channels(), im_ifft.type());
 }
 
 module.exports = {
@@ -312,7 +282,7 @@ module.exports = {
     GaussModif,
     ZeroPadding,
     ZeroUnpadding,
-    PrepareToDFT,
+    PrepareToFFT,
     CrossQuads,
     MakeFFT,
     ApplyHomomorphic
