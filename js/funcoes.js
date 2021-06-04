@@ -261,54 +261,51 @@ function ApplyHomomorphic(huv, image) {
 
     // Converte a imagem para float
     z_padded.convertTo(z_padded, cv.CV_32F);
-    // console.log('z_padded');
-    // VarParams(z_padded);
+    console.log('z_padded');
+    VarParams(z_padded);
 
     // Aplica o logaritmo
     let im_log = new cv.Mat();
     cv.log(z_padded, im_log);
-    // console.log('im_log');
-    // VarParams(im_log);
+    console.log('im_log');
+    VarParams(im_log);
 
     // Prepara a imagem para a FFT(parte real e imaginária)
     let im_fft = PrepareToFFT(im_log);
-    // console.log('im_fft');
-    // VarParams(im_fft);
+    let v = new cv.MatVector();
+    cv.split(im_fft, v);
+    let canal1 = v.get(0);
+    let canal2 = v.get(1);
 
     // FFT
-    cv.dft(im_fft, im_fft, cv.DFT_COMPLEX_OUTPUT);
+    cv.dft(im_fft, im_fft);
     console.log('im_fft após fft');
     VarParams(im_fft);
 
     // Prepara huv para ser aplicado na filtragem - imagem complexa
     let cross_huv = huv;
     CrossQuads(cross_huv);
-    let v_huv = new cv.MatVector();
-    v_huv.push_back(cross_huv);
-    v_huv.push_back(cross_huv);
-    let m_huv = new cv.Mat();
-    cv.merge(v_huv, m_huv);
-    v_huv.delete();
-    console.log('m_huv');
-    VarParams(m_huv);
+    // v_huv.delete();
+    // console.log('m_huv');
+    // VarParams(m_huv);
 
     // Filtragem im_fft * m_huv
-    let im_filtrada = new cv.Mat();
-    cv.multiply(im_fft, m_huv, im_filtrada);
+    // let im_filtrada = new cv.Mat();
+    // cv.multiply(im_fft, huv, im_filtrada);
     // console.log('im_filtrada');
     // VarParams(im_filtrada);
 
     // Inverte FFT
-    let im_ifft = new cv.Mat();
-    cv.dft(im_filtrada, im_ifft, cv.DFT_INVERSE);
+    // let im_ifft = new cv.Mat();
+    // cv.dft(im_filtrada, im_ifft, cv.DFT_INVERSE);
     // console.log('im_ifft')
     // VarParams(im_ifft);
 
     // Calcula a exponencial(inversão do logaritmo)
-    let im_exp = new cv.Mat();
-    cv.exp(im_ifft, im_exp);
-    console.log('im_exp');
-    VarParams(im_exp);
+    // let im_exp = new cv.Mat();
+    // cv.exp(im_ifft, im_exp);
+    // console.log('im_exp');
+    // VarParams(im_exp);
 
 
 }
