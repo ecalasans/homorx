@@ -1,4 +1,4 @@
-const cv = require('./opencv');
+const cv = require('../opencv');
 
 // Função para compor a meshgrid
 function MeshgridJS(xdim, ydim){
@@ -31,21 +31,21 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     let im_w = cv.getOptimalDFTSize(imagem.cols);
 
     //Coordenadas do centro
-    let u_c = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(im_h/2));
-    let v_c = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(im_w/2));
+    let u_c = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(im_h/2));
+    let v_c = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(im_w/2));
 
     // Inclinacao da curva
-    let m_c = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(c));
+    let m_c = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(c));
 
     // Frequencia de corte
-    let m_d0 = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(D0));
+    let m_d0 = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(D0));
 
     //Matriz de Coordenadas
     let arr = MeshgridJS(im_h,im_w);
     let a = arr['u'];
-    a = cv.matFromArray(im_h, im_w, cv.CV_64F, a);
+    a = cv.matFromArray(im_h, im_w, cv.CV_32F, a);
     let b = arr['v'];
-    b = cv.matFromArray(im_h, im_w, cv.CV_64F, b);
+    b = cv.matFromArray(im_h, im_w, cv.CV_32F, b);
 
     //Etapas de cálculo de H(u,v)
     // 1.  Cálculo de D(u,v)/D0
@@ -76,7 +76,7 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     m_d0.delete();
 
     // 2.  Cálculo de -c * d_d0
-    let menos_um = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(-1));
+    let menos_um = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(-1));
     let menos_c = new cv.Mat();
 
     // -c
@@ -89,7 +89,7 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
 
     // 3.  Cálculo de 1 - exp(menos_c)
     // Matriz de "uns"
-    let um = new cv.Mat.ones(im_h, im_w, cv.CV_64F);
+    let um = new cv.Mat.ones(im_h, im_w, cv.CV_32F);
 
     // Exponencial
     let exponencial = new cv.Mat();
@@ -103,8 +103,8 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     um.delete();
 
     // 4.  Cálculo de H(u,v)
-    let m_gamma_l = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(gamma_l));
-    let m_gamma_h = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(gamma_h));
+    let m_gamma_l = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(gamma_l));
+    let m_gamma_h = new cv.Mat(im_h, im_w, cv.CV_32F, new cv.Scalar(gamma_h));
     let gh_gl = new cv.Mat();
 
     // gamma_h - gamma_l
@@ -160,8 +160,8 @@ function ZeroUnpadding(imagem, padded_imagem) {
 function PrepareToFFT(padded_imagem){
     let vetor = new cv.MatVector();
     let parte_real = new cv.Mat();
-    padded_imagem.convertTo(parte_real, cv.CV_64F);
-    let parte_imaginaria = new cv.Mat.zeros(padded_imagem.rows, padded_imagem.cols, cv.CV_64F);
+    padded_imagem.convertTo(parte_real, cv.CV_32F);
+    let parte_imaginaria = new cv.Mat.zeros(padded_imagem.rows, padded_imagem.cols, cv.CV_32F);
     let complexa = new cv.Mat();
     vetor.push_back(parte_real);
     vetor.push_back(parte_imaginaria);
@@ -232,8 +232,8 @@ function MakeFFT(imagem) {
     cv.normalize(mag, mag, 0, 255, cv.NORM_MINMAX);
 
     //Cruza os quadrantes para mostrar
-    //CrossQuads(mag);
-    //CrossQuads(im_fft);
+    CrossQuads(mag);
+    CrossQuads(im_fft);
 
     return {'espectro': mag, 'fft' : im_fft}
 }
@@ -268,7 +268,7 @@ function ApplyHomomorphic(huv, image) {
     VarParams(z_padded);
 
     // Converte a imagem para float
-    z_padded.convertTo(z_padded, cv.CV_64F);
+    z_padded.convertTo(z_padded, cv.CV_32F);
     console.log('z_padded');
     VarParams(z_padded);
 
@@ -300,24 +300,40 @@ function ApplyHomomorphic(huv, image) {
     console.log('m_huv');
     VarParams(m_huv);
 
-    // // Filtragem im_fft * m_huv
-    // let im_filtrada = new cv.Mat();
-    // cv.multiply(im_fft, m_huv, im_filtrada);
-    // console.log('im_filtrada');
-    // VarParams(im_filtrada);
+    // Filtragem im_fft * m_huv
+    let im_filtrada = new cv.Mat();
+    cv.multiply(im_fft, m_huv, im_filtrada);
+    console.log('im_filtrada');
+    VarParams(im_filtrada);
     //
     //
-    // // Inverte FFT
-    // let im_ifft = new cv.Mat();
-    // cv.dft(im_filtrada, im_ifft, cv.DFT_INVERSE|cv.DFT_SCALE);
-    // console.log('im_ifft')
-    // VarParams(im_ifft);
+    // Inverte FFT
+    let im_ifft = new cv.Mat();
+    cv.dft(im_filtrada, im_ifft, cv.DFT_INVERSE|cv.DFT_SCALE);
+    console.log('im_ifft')
+    VarParams(im_ifft);
+
+    // Magnitude da ifft
     //
-    // // Calcula a exponencial(inversão do logaritmo)
-    // let im_exp = new cv.Mat();
-    // cv.exp(im_ifft, im_exp);
-    // console.log('im_exp');
-    // VarParams(im_exp);
+    // Calcula a exponencial(inversão do logaritmo)
+    let im_exp = new cv.Mat();
+    cv.exp(im_ifft, im_exp);
+    console.log('im_exp');
+    VarParams(im_exp);
+
+    // Subtrai 1 para reverter o que foi adicionado na preparação para o logaritmo
+    let v_uns = new cv.MatVector();
+    let menos_um = new cv.Mat();
+    let uns32 = new cv.Mat.ones(im_exp.rows, im_exp.cols, cv.CV_32F);
+    v_uns.push_back(uns32);
+    v_uns.push_back(uns32);
+    cv.merge(v_uns, menos_um);
+    v_uns.delete();
+
+    cv.subtract(im_exp, menos_um, menos_um);
+    console.log('menos um');
+    VarParams(menos_um);
+
     //
     // let im_8bits = new cv.Mat();
     // let componentes = new cv.MatVector();

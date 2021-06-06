@@ -1,4 +1,4 @@
-const cv = require('./js/opencv');
+const cv = require('./opencv');
 require('./js/jquery');
 const funcoes = require('./js/funcoes');
 const $ = require('jquery-browserify');
