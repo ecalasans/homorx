@@ -167,10 +167,10 @@ $(document).ready(function () {
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
         let huv = funcoes.GaussModif(
-            gamma_l,
-            gamma_h,
-            c,
-            d0, dst);
+            0.45,
+            2.0,
+            4.0,
+            1000, dst);
 
         fft_imagem = funcoes.MakeFFT(dst);
         imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
