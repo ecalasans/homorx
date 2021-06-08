@@ -167,16 +167,16 @@ $(document).ready(function () {
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
         let huv = funcoes.GaussModif(
-            0.45,
-            2.0,
-            4.0,
-            1000, dst);
+            0.87,
+            9.2,
+            0.5,
+            1523, dst);
 
         fft_imagem = funcoes.MakeFFT(dst);
         imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
 
         cv.imshow('huv_canvas', huv);
-        cv.imshow('img_canvas', fft_imagem['espectro']);
+        //cv.imshow('img_canvas', imagem_filtrada);
 
     });
 
