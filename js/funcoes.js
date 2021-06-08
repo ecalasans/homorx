@@ -260,15 +260,15 @@ function ApplyHomomorphic(huv, image) {
     // Converte huv em 2 canais
     let v = new cv.MatVector();
     let norm_huv = new cv.Mat();
-    cv.normalize(huv, norm_huv, 0, 1, cv.NORM_MINMAX, cv.CV_64F);
-    v.push_back(norm_huv);
-    v.push_back(norm_huv);
+    //cv.normalize(huv, norm_huv, 0, 1, cv.NORM_MINMAX, cv.CV_64F);
+    v.push_back(huv);
+    v.push_back(huv);
     let huv_2c = new cv.Mat();
     cv.merge(v, huv_2c);
     v.delete();
     norm_huv.delete();
-    console.log('huv2c');
-    VarParams(huv_2c);
+    // console.log('huv2c');
+    // VarParams(huv_2c);
 
     // Faz o padding com 0s
     let z_padded = ZeroPadding(image);
@@ -304,6 +304,8 @@ function ApplyHomomorphic(huv, image) {
     let im_fft = new cv.Mat();
     cv.dft(prep_fft, im_fft, cv.DFT_COMPLEX_OUTPUT);
     CrossQuads(im_fft);
+    console.log('im_fft');
+    VarParams(im_fft);
 
     // Faz a filtragem
     let filtragem = new cv.Mat();
@@ -315,27 +317,39 @@ function ApplyHomomorphic(huv, image) {
 
     // IFFT
     let im_ifft = new cv.Mat();
-    cv.dft(filtragem, im_ifft, cv.DFT_INVERSE|cv.DFT_REAL_OUTPUT|cv.DFT_SCALE);
-    // console.log('ifft');
-    // VarParams(im_ifft);
+    cv.dft(filtragem, im_ifft, cv.DFT_INVERSE|cv.DFT_SCALE);
+    console.log('ifft');
+    VarParams(im_ifft);
+
+    // Extrai a parte real da IFFT
+    let ifft_componentes = new cv.MatVector();
+    cv.split(im_ifft, ifft_componentes);
+    let ifft_re = ifft_componentes.get(0);
+    let ifft_imag = ifft_componentes.get(1);
+    ifft_componentes.delete();
 
     // Exponencial
     let im_exp = new cv.Mat();
-    cv.exp(im_ifft, im_exp);
+    cv.exp(ifft_re, im_exp);
     console.log('im_exp');
     VarParams(im_exp);
-
-    // // Subtrai 1, incorporado na operação do logaritmo
-    // let uns_sub = new cv.Mat.ones(im_exp.rows, im_exp.cols, cv.CV_64F);
-    // let menos_um = new cv.Mat();
-    // cv.subtract(im_exp, uns_sub, menos_um);
-    // console.log('menos um');
-    // VarParams(menos_um);
     //
+    // Subtrai 1 adicionado na operação do logaritmo
+    let uns_64 = new cv.Mat.ones(im_exp.rows, im_exp.cols, im_exp.type());
+    cv.subtract(im_exp, uns_64, im_exp);
+    console.log('im_exp menos 1');
+    VarParams(im_exp);
+
     // // Converte para inteiro e normaliza para 255
     // let imagem_final = new cv.Mat();
-    // menos_um.convertTo(imagem_final, cv.CV_8UC1);
-    // console.log('imagem_final');
+    // im_exp.convertTo(imagem_final, cv.CV_8U);
+    // im_exp.delete();
+    // // console.log('imagem final em 8 bits');
+    // // VarParams(imagem_final);
+    //
+    // cv.normalize(im_exp, imagem_final, 255, 0, cv.NORM_MINMAX);
+    // //imagem_final.convertTo(imagem_final, cv.CV_8U);
+    // console.log('imagem final em 8 bits normalizada');
     // VarParams(imagem_final);
     //
     // return imagem_final;
