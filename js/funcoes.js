@@ -120,7 +120,6 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
     um_menos_exp.delete();
     console.log('GaussModif - m_huv');
     VarParams(m_huv);
-    cv.normalize(m_huv, m_huv, 0, 1, cv.NORM_MINMAX);
     return m_huv;
 }
 
@@ -243,7 +242,7 @@ function MakeFFT(imagem) {
 // Função para detectar NaN
 function DetectIsNan(imagem){
     console.log('data: ', imagem.ucharAt(0,0));
-    console.log('data32F: ', imagem.floatAt(0,0))
+    console.log('data64F: ', imagem.floatAt(0,0))
 }
 
 // Função para retornar parâmetros
@@ -260,15 +259,16 @@ function VarParams(v) {
 function ApplyHomomorphic(huv, image) {
     // Converte huv em 2 canais
     let v = new cv.MatVector();
-    let norm_huv = new cv.Mat();
-    v.push_back(huv);
-    v.push_back(huv);
+    let temp = huv.clone();
+    CrossQuads(temp);
+    v.push_back(temp);
+    v.push_back(temp);
     let huv_2c = new cv.Mat();
     cv.merge(v, huv_2c);
     v.delete();
-    norm_huv.delete();
-    // console.log('huv2c');
-    // VarParams(huv_2c);
+    temp.delete();
+    console.log('huv2c');
+    VarParams(huv_2c);
 
     // Faz o padding com 0s
     let z_padded = ZeroPadding(image);
@@ -295,6 +295,7 @@ function ApplyHomomorphic(huv, image) {
     // VarParams(im_log);
 
     // Prepara a imagem para a FFT(parte real e imaginária)
+    CrossQuads(im_log);
     let prep_fft = PrepareToFFT(im_log);
     im_log.delete()
     // console.log('prep_fft');
@@ -303,13 +304,12 @@ function ApplyHomomorphic(huv, image) {
     // FFT
     let im_fft = new cv.Mat();
     cv.dft(prep_fft, im_fft, cv.DFT_COMPLEX_OUTPUT);
-    CrossQuads(im_fft);
     console.log('im_fft');
     VarParams(im_fft);
 
     // Faz a filtragem
     let filtragem = new cv.Mat();
-    filtragem = im_fft.mul(huv_2c, 1);
+    cv.multiply(im_fft, huv_2c, filtragem);
     im_fft.delete();
     huv_2c.delete();
     // console.log('filtragem');
@@ -325,9 +325,8 @@ function ApplyHomomorphic(huv, image) {
     let ifft_componentes = new cv.MatVector();
     cv.split(im_ifft, ifft_componentes);
     let ifft_re = ifft_componentes.get(0);
+    let ifft_imag = ifft_componentes.get(1);
     ifft_componentes.delete();
-
-    //TODO - calcular a magnitude da IFFT, normalizar para 0-5
 
     // Exponencial
     let im_exp = new cv.Mat();
@@ -338,26 +337,20 @@ function ApplyHomomorphic(huv, image) {
     // Subtrai 1 adicionado na operação do logaritmo
     let uns_64 = new cv.Mat.ones(im_exp.rows, im_exp.cols, im_exp.type());
     cv.subtract(im_exp, uns_64, im_exp);
+    // cv.normalize(im_exp, im_exp, 1, 0, cv.NORM_MINMAX);
     console.log('im_exp menos 1');
     VarParams(im_exp);
 
-    // Normaliza para 0 e 1
-    cv.normalize(im_exp, im_exp, 0, 1, cv.NORM_MINMAX);
-
-
-    // // Converte para inteiro e normaliza para 255
+    // Converte para 8 bits
     let imagem_final = new cv.Mat();
-    // im_exp.convertTo(imagem_final, cv.CV_8U);
-    // im_exp.delete();
-    // // console.log('imagem final em 8 bits');
-    // // VarParams(imagem_final);
-    //
-    cv.normalize(im_exp, imagem_final, 255, 0, cv.NORM_MINMAX);
-    imagem_final.convertTo(imagem_final, cv.CV_8U);
-    console.log('imagem final');
+    im_exp.convertTo(imagem_final, cv.CV_8U);
+    // cv.normalize(imagem_final, imagem_final, 255, 0, cv.NORM_MINMAX);
+    CrossQuads(imagem_final);
+    console.log('imagem final normalizada');
     VarParams(imagem_final);
-    //
+
     return imagem_final;
+
 }
 
 module.exports = {

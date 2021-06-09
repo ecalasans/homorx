@@ -175,6 +175,11 @@ $(document).ready(function () {
         fft_imagem = funcoes.MakeFFT(dst);
         imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
 
+        let show_huv = new cv.Mat();
+        huv.convertTo(show_huv, cv.CV_8UC1);
+        console.log('huv', huv.type());
+        console.log('show_huv', show_huv.type());
+
         cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', imagem_filtrada);
 
