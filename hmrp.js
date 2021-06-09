@@ -176,7 +176,7 @@ $(document).ready(function () {
         imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
 
         cv.imshow('huv_canvas', huv);
-        // cv.imshow('img_canvas', imagem_filtrada);
+        cv.imshow('img_canvas', imagem_filtrada);
 
     });
 
