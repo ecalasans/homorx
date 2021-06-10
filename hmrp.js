@@ -174,15 +174,11 @@ $(document).ready(function () {
 
         fft_imagem = funcoes.MakeFFT(dst);
         imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
-
-        let show_huv = new cv.Mat();
-        huv.convertTo(show_huv, cv.CV_8UC1);
-        console.log('huv', huv.type());
-        console.log('show_huv', show_huv.type());
+        // cv.normalize(imagem_filtrada, imagem_filtrada, 0, 255, cv.NORM_MINMAX);
+        // imagem_filtrada.convertTo(imagem_filtrada, cv.CV_8U);
 
         cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', imagem_filtrada);
-
     });
 
 });
