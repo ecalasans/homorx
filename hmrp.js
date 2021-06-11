@@ -6,6 +6,7 @@ const $ = require('jquery-browserify');
 
 $(document).ready(function () {
 //  Variáveis e constantes iniciais
+    let mat;
     let imagem;
     let dst;
     let huv;
@@ -44,11 +45,11 @@ $(document).ready(function () {
             dst
         );
 
-        //fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
         //funcoes.CrossQuads(huv);
         cv.imshow('huv_canvas', huv);
-        //cv.imshow('img_canvas', fft_imagem);
+        cv.imshow('img_canvas', fft_imagem);
 
     });
 
@@ -65,11 +66,11 @@ $(document).ready(function () {
             dst
         );
 
-       // fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+       fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
         //funcoes.CrossQuads(huv);
         cv.imshow('huv_canvas', huv);
-        //cv.imshow('img_canvas', fft_imagem);
+        cv.imshow('img_canvas', fft_imagem);
     });
 
     $("#c_slider").change(function () {
@@ -85,11 +86,11 @@ $(document).ready(function () {
             dst
         );
 
-        //fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
         //funcoes.CrossQuads(huv);
         cv.imshow('huv_canvas', huv);
-        //cv.imshow('img_canvas', fft_imagem);
+        cv.imshow('img_canvas', fft_imagem);
     });
 
     $("#d0_slider").change(function () {
@@ -106,11 +107,11 @@ $(document).ready(function () {
             dst
         );
 
-        //fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
         //funcoes.CrossQuads(huv);
         cv.imshow('huv_canvas', huv);
-        //cv.imshow('img_canvas', fft_imagem);
+        cv.imshow('img_canvas', fft_imagem);
     });
 ///////////////////////////////
     //Abre a caixa de diálogo para selecionar imagem
@@ -162,12 +163,12 @@ $(document).ready(function () {
 
     //Carrega a imagem via OpenCV
     $("#img_container").load(function () {
-        var mat = cv.imread(imagem);
+        mat = cv.imread(imagem);
         console.log("Dimensões da imagem original:  " + mat.rows, mat.cols);
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
         let huv = funcoes.GaussModif(
-            0.82,
+            0.85,
             8.9,
             2.0,
             1724, dst);

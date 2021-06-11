@@ -77,6 +77,7 @@ function GaussModif(gamma_l = 0.0, gamma_h = 0.0, c = 0.0, D0 = 0.0, imagem) {
 
     // 2.  Cálculo de -c * d_d0
     let menos_um = new cv.Mat(im_h, im_w, cv.CV_64F, new cv.Scalar(-1));
+    console.log(menos_um.doubleAt(0,0));
     let menos_c = new cv.Mat();
 
     // -c
@@ -260,7 +261,7 @@ function ApplyHomomorphic(huv, image) {
     // Converte huv em 2 canais
     let v = new cv.MatVector();
     let temp = huv.clone();
-    //cv.normalize(temp, temp, 0, 1, cv.NORM_MINMAX);
+    // cv.normalize(temp, temp, 0, 1, cv.NORM_MINMAX);
     CrossQuads(temp);
     v.push_back(temp);
     v.push_back(temp);
@@ -268,8 +269,8 @@ function ApplyHomomorphic(huv, image) {
     cv.merge(v, huv_2c);
     v.delete();
     temp.delete();
-    console.log('huv2c');
-    VarParams(huv_2c);
+    // console.log('huv2c');
+    // VarParams(huv_2c);
 
     // Faz o padding com 0s
     let z_padded = ZeroPadding(image);
@@ -296,7 +297,7 @@ function ApplyHomomorphic(huv, image) {
     // VarParams(im_log);
 
     // Prepara a imagem para a FFT(parte real e imaginária)
-    //CrossQuads(im_log);
+    // CrossQuads(im_log);
     let prep_fft = PrepareToFFT(im_log);
     im_log.delete()
     // console.log('prep_fft');
@@ -305,17 +306,39 @@ function ApplyHomomorphic(huv, image) {
     // FFT
     let im_fft = new cv.Mat();
     cv.dft(prep_fft, im_fft, cv.DFT_COMPLEX_OUTPUT);
-    console.log('im_fft');
-    VarParams(im_fft);
+    // let componentes = new cv.MatVector();
+    // cv.split(im_fft, componentes);
+    // let fft_re = componentes.get(0);
+    // let fft_i = componentes.get(1);
+    // componentes.delete();
+    // // CrossQuads(im_fft);
+    // console.log('fftre');
+    // VarParams(fft_re);
 
     // Faz a filtragem
-    let filtragem = new cv.Mat();
-    cv.multiply(im_fft, huv_2c, filtragem);
-    im_fft.delete();
-    huv_2c.delete();
+    // let filt_re = new Array();
+    // let filt_im = new Array();
+    // let produto = new cv.MatVector();
+    // // cv.multiply(im_fft, huv_2c, filtragem);
+    // for (let i = 0; i < im_fft.rows; i++) {
+    //     for (let j = 0; j < im_fft.cols; j++) {
+    //         filt_re.push(fft_re.doubleAt(i, j) * huv.doubleAt(i, j));
+    //         filt_im.push(fft_i.doubleAt(i, j) * huv.doubleAt(i, j));
+    //     }
+    // }
+    // let filt_re64 = cv.matFromArray(im_fft.rows, im_fft.cols, cv.CV_64F, filt_re);
+    // let filt_im64 = cv.matFromArray(im_fft.rows, im_fft.cols, cv.CV_64F, filt_im);
+    // produto.push_back(filt_re64);
+    // produto.push_back(filt_im64);
+    // let filtragem = new cv.Mat();
+    // cv.merge(produto, filtragem);
     // console.log('filtragem');
     // VarParams(filtragem);
-
+    // filt_re64.delete(); filt_im64.delete();
+    // produto.delete();
+    let filtragem = new cv.Mat();
+    cv.multiply(im_fft, huv_2c, filtragem);
+    //
     // IFFT
     let im_ifft = new cv.Mat();
     cv.dft(filtragem, im_ifft, cv.DFT_INVERSE|cv.DFT_SCALE);
@@ -328,23 +351,23 @@ function ApplyHomomorphic(huv, image) {
     let ifft_re = ifft_componentes.get(0);
     ifft_componentes.delete();
 
-    cv.normalize(ifft_re, ifft_re, 0, 1, cv.NORM_MINMAX);
-
     // Exponencial
     let im_exp = new cv.Mat();
     cv.exp(ifft_re, im_exp);
-    console.log('im_exp');
-    VarParams(im_exp);
+    // console.log('im_exp');
+    // VarParams(im_exp);
     //
     // Subtrai 1 adicionado na operação do logaritmo
     let uns_64 = new cv.Mat.ones(im_exp.rows, im_exp.cols, im_exp.type());
     cv.subtract(im_exp, uns_64, im_exp);
 
-    //cv.normalize(im_exp, im_exp, 0, 255, cv.NORM_MINMAX);
-    // im_exp.convertTo(im_exp, cv.CV_8U);
-    console.log('im_exp menos 1');
+
+    // Normaliza entre 0 e 255
+    cv.normalize(im_exp, im_exp, 0, 255, cv.NORM_MINMAX);
+    console.log('imexp');
     VarParams(im_exp);
-    return im_exp;
+
+    return ZeroUnpadding(image, im_exp);
 }
 
 module.exports = {
