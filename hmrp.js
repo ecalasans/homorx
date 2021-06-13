@@ -161,13 +161,39 @@ $(document).ready(function () {
         imagem.src = URL.createObjectURL(e.target.files[0]);
     });
 
+    // Carrega a imagem ampliada
+    $("#img_container").click(function (e) {
+        e.preventDefault();
+        let imagem = document.getElementById("img_container")
+        let im_ampliada = document.getElementById("imagem_ampliada");
+        im_ampliada.src = imagem.src;
+        $("#modal_imagem_original").modal('show');
+    });
+
+    // Carrega a imagem filtrada ampliada
+    $("#img_canvas").click(function (e) {
+        e.preventDefault();
+        huv = funcoes.GaussModif(
+            parseFloat(gl_slider.value),
+            parseFloat(gh_slider.value),
+            parseFloat(c_slider.value),
+            parseFloat(d0_slider.value),
+            dst
+        );
+
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+
+        $("#modal_imagem_filtrada").modal('show');
+        cv.imshow('filt_ampliada', fft_imagem);
+    })
+
     //Carrega a imagem via OpenCV
     $("#img_container").load(function () {
         mat = cv.imread(imagem);
         console.log("Dimensões da imagem original:  " + mat.rows, mat.cols);
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
-        let huv = funcoes.GaussModif(
+        huv = funcoes.GaussModif(
             0.85,
             8.9,
             2.0,

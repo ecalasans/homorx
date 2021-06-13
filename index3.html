@@ -29,7 +29,8 @@
     <section class="imagem container">
         <div class="row mt-2">
             <div class="col-md-4 col-lg-4">
-                <img id="img_container" class="img_reducao mx-auto d-block">
+                <img id="img_container" class="img_reducao mx-auto d-block" data-toggle="modal"
+                    data-target="#modal_imagem_ampliada">
             </div>
             <div class="col-md-4 col-lg-4">
                 <canvas id="huv_canvas" class="img_reducao mx-auto d-block"></canvas>
@@ -73,6 +74,27 @@
         </div>
     </section>
 </main>
+    <section class="modais">
+        <div class="modal fade" id="modal_imagem_original" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body" style="text-align: center;">
+                        <img id="imagem_ampliada" class="img_modal"
+                            style="max-width: 80%; max-height: 80%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="modal_imagem_filtrada" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-body img_zoom" style="text-align: center;">
+                        <canvas id="filt_ampliada"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 <footer class="container">
     <p class="rodape text-center pt-3">&copy;Desenvolvido por ECalasans 2021</p>
 </footer>
