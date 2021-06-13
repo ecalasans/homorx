@@ -37,7 +37,9 @@ $(document).ready(function () {
         document.getElementById("gamma_l_label").innerHTML = texto;
         MathJax.typeset();
 
-        huv = funcoes.GaussModif(
+        let temp_huv = huv.clone();
+
+        temp_huv = funcoes.GaussModif(
             parseFloat(gl_slider.value),
             parseFloat(gh_slider.value),
             parseFloat(c_slider.value),
@@ -45,11 +47,12 @@ $(document).ready(function () {
             dst
         );
 
-        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        cv.imshow('huv_canvas', huv);
+        // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+        temp_huv.delete();
 
     });
 
@@ -58,7 +61,9 @@ $(document).ready(function () {
         document.getElementById("gamma_h_label").innerHTML = texto;
         MathJax.typeset();
 
-        huv = funcoes.GaussModif(
+        let temp_huv = huv.clone();
+
+        temp_huv = funcoes.GaussModif(
             parseFloat(gl_slider.value),
             parseFloat(gh_slider.value),
             parseFloat(c_slider.value),
@@ -66,11 +71,12 @@ $(document).ready(function () {
             dst
         );
 
-       fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        cv.imshow('huv_canvas', huv);
+        // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+        temp_huv.delete();
     });
 
     $("#c_slider").change(function () {
@@ -78,7 +84,9 @@ $(document).ready(function () {
         document.getElementById("c_label").innerHTML = texto;
         MathJax.typeset();
 
-        huv = funcoes.GaussModif(
+        let temp_huv = huv.clone();
+
+        temp_huv = funcoes.GaussModif(
             parseFloat(gl_slider.value),
             parseFloat(gh_slider.value),
             parseFloat(c_slider.value),
@@ -86,11 +94,12 @@ $(document).ready(function () {
             dst
         );
 
-        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        cv.imshow('huv_canvas', huv);
+        // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+        temp_huv.delete();
     });
 
     $("#d0_slider").change(function () {
@@ -99,7 +108,9 @@ $(document).ready(function () {
         document.getElementById("d0_label").innerHTML = texto;
         MathJax.typeset();
 
-        huv = funcoes.GaussModif(
+        let temp_huv = huv.clone();
+
+        temp_huv = funcoes.GaussModif(
             parseFloat(gl_slider.value),
             parseFloat(gh_slider.value),
             parseFloat(c_slider.value),
@@ -107,55 +118,14 @@ $(document).ready(function () {
             dst
         );
 
-        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+        fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        cv.imshow('huv_canvas', huv);
+        // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+        temp_huv.delete();
     });
 ///////////////////////////////
-    //Abre a caixa de diálogo para selecionar imagem
-    $("#carregar").click(function () {
-        $("#rx_input").trigger('click');
-    });
-
-    //Limpa os valores dos controles
-    $("#limpar").click(function () {
-        //  Restaura o valor dos controles**
-        document.getElementById("gamma_l").value = gamma_l;
-        document.getElementById("gamma_h").value = gamma_h;
-        document.getElementById("c_slider").value = c;
-        document.getElementById("d0_slider").value = d0;
-
-        let texto = "\\(\\gamma_{L} = 0.01 "+"\\)";
-        document.getElementById("gamma_l_label").innerHTML = texto;
-        MathJax.typeset();
-
-        texto = "\\(\\gamma_{H} = 1.0 "+"\\)";
-        document.getElementById("gamma_h_label").innerHTML = texto;
-        MathJax.typeset();
-
-        texto = "\\(c = 0.0 "+"\\)";
-        document.getElementById("c_label").innerHTML = texto;
-        MathJax.typeset();
-
-        texto = "\\(D_{0} = 30 "+"\\)";
-        document.getElementById("d0_label").innerHTML = texto;
-        MathJax.typeset();
-
-        // Restaura a imagem
-        huv = funcoes.GaussModif(
-            parseFloat(gl_slider.value),
-            parseFloat(gh_slider.value),
-            parseFloat(c_slider.value),
-            parseFloat(d0_slider.value),
-            dst
-        );
-
-        cv.imshow('img_canvas', huv);
-        huv.delete();
-    });
-
     $("#rx_input").change(function (e) {
         imagem = document.getElementById("img_container");
         imagem.src = URL.createObjectURL(e.target.files[0]);
@@ -201,11 +171,72 @@ $(document).ready(function () {
 
         fft_imagem = funcoes.MakeFFT(dst);
         imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
-        // cv.normalize(imagem_filtrada, imagem_filtrada, 0, 255, cv.NORM_MINMAX);
-        // imagem_filtrada.convertTo(imagem_filtrada, cv.CV_8U);
 
-        cv.imshow('huv_canvas', huv);
+        // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', imagem_filtrada);
+    });
+/////////////////////////
+// BOTÕES
+    //Abre a caixa de diálogo para selecionar imagem
+    $("#carregar").click(function () {
+        $("#rx_input").trigger('click');
+    });
+
+    //Limpa os valores dos controles
+    $("#limpar").click(function () {
+        //  Restaura o valor dos controles**
+        document.getElementById("gamma_l").value = gamma_l;
+        document.getElementById("gamma_h").value = gamma_h;
+        document.getElementById("c_slider").value = c;
+        document.getElementById("d0_slider").value = d0;
+
+        let texto = "\\(\\gamma_{L} = 0.01 "+"\\)";
+        document.getElementById("gamma_l_label").innerHTML = texto;
+        MathJax.typeset();
+
+        texto = "\\(\\gamma_{H} = 1.0 "+"\\)";
+        document.getElementById("gamma_h_label").innerHTML = texto;
+        MathJax.typeset();
+
+        texto = "\\(c = 0.0 "+"\\)";
+        document.getElementById("c_label").innerHTML = texto;
+        MathJax.typeset();
+
+        texto = "\\(D_{0} = 30 "+"\\)";
+        document.getElementById("d0_label").innerHTML = texto;
+        MathJax.typeset();
+
+        // Restaura a imagem
+        huv = funcoes.GaussModif(
+            parseFloat(gl_slider.value),
+            parseFloat(gh_slider.value),
+            parseFloat(c_slider.value),
+            parseFloat(d0_slider.value),
+            dst
+        );
+
+        fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
+
+        // cv.imshow('img_canvas', huv);
+        cv.imshow('img_canvas', fft_imagem);
+    });
+
+    // Calcula o histograma e envia para o banco de dados juntamente com os valores selecionados
+    $("#salvar").click(function (e) {
+        e.preventDefault();
+        // Calcula o histograma
+        let channels = [0];
+        let hist_size = [256];
+        let ranges = [0, 255];
+        let acumulado = false;
+        let histograma = new cv.Mat();
+        let mask = new cv.Mat();
+        let vetor_imagem = new cv.MatVector();
+        vetor_imagem.push_back(dst);
+
+        cv.calcHist(vetor_imagem, channels, mask, histograma, hist_size, ranges, acumulado);
+        console.log("histograma");
+        console.log(histograma.data32F);
     });
 
 });

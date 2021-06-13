@@ -20,22 +20,22 @@
                 <p class="justify-content-center mt-3">Clique no botão Carregar para abrir uma imagem na tela.
                     Faça os ajustes necessários nos
                     controles até que você consiga visualizar bem o trajeto do PICC e a ponta.  Em seguida clique
-                    Salvar para que os dados sejam enviados.
-                    Clique em Limpar para retornar a imagem ao estado original.</p>
+                    Salvar para que os dados sejam enviados.  Clique em cima das imagens para ampliá-las.
+                    Clique em Limpar para apagar a filtragem e zerar os controles.</p>
             </div>
             <div class="col-md-2 col-lg-2"></div>
         </div>
     </section>
     <section class="imagem container">
         <div class="row mt-2">
-            <div class="col-md-4 col-lg-4">
+            <div class="col-md-6 col-lg-6">
                 <img id="img_container" class="img_reducao mx-auto d-block" data-toggle="modal"
                     data-target="#modal_imagem_ampliada">
             </div>
-            <div class="col-md-4 col-lg-4">
-                <canvas id="huv_canvas" class="img_reducao mx-auto d-block"></canvas>
-            </div>
-            <div class="col-md-4 col-lg-4">
+<!--            <div class="col-md-4 col-lg-4">-->
+<!--                <canvas id="huv_canvas" class="img_reducao mx-auto d-block"></canvas>-->
+<!--            </div>-->
+            <div class="col-md-6 col-lg-6">
                 <input type="file" id="rx_input" name="rx" class="escondido">
                 <!--                    <p id="loading" class="text-center">Carregando OpenCV.js ...</p>-->
                 <canvas id="img_canvas" class="img_reducao mx-auto d-block"></canvas>
@@ -86,10 +86,10 @@
             </div>
         </div>
         <div class="modal fade" id="modal_imagem_filtrada" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
+            <div class="modal-dialog" role="document" style="height: 1000px !important;">
                 <div class="modal-content">
-                    <div class="modal-body img_zoom" style="text-align: center;">
-                        <canvas id="filt_ampliada"></canvas>
+                    <div class="modal-body" style="text-align: center;">
+                        <canvas id="filt_ampliada" class="img_zoom"></canvas>
                     </div>
                 </div>
             </div>
