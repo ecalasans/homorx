@@ -52,6 +52,14 @@ $(document).ready(function () {
         //funcoes.CrossQuads(huv);
         // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+
+        // Atualiza valores das variáveis
+        gamma_l = gl_slider.value;
+        gamma_h = gh_slider.value;
+        c = c_slider.value;
+        d0 = d0_slider.value;
+
+        // Limpa variáveis temporárias
         temp_huv.delete();
 
     });
@@ -76,6 +84,14 @@ $(document).ready(function () {
         //funcoes.CrossQuads(huv);
         // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+
+        // Atualiza valores das variáveis
+        gamma_l = gl_slider.value;
+        gamma_h = gh_slider.value;
+        c = c_slider.value;
+        d0 = d0_slider.value;
+
+        // Limpa variáveis temporárias
         temp_huv.delete();
     });
 
@@ -99,6 +115,14 @@ $(document).ready(function () {
         //funcoes.CrossQuads(huv);
         // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+
+        // Atualiza valores das variáveis
+        gamma_l = gl_slider.value;
+        gamma_h = gh_slider.value;
+        c = c_slider.value;
+        d0 = d0_slider.value;
+
+        // Limpa variáveis temporárias
         temp_huv.delete();
     });
 
@@ -123,6 +147,14 @@ $(document).ready(function () {
         //funcoes.CrossQuads(huv);
         // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
+
+        // Atualiza valores das variáveis
+        gamma_l = gl_slider.value;
+        gamma_h = gh_slider.value;
+        c = c_slider.value;
+        d0 = d0_slider.value;
+
+        // Limpa variáveis temporárias
         temp_huv.delete();
     });
 ///////////////////////////////
@@ -184,6 +216,12 @@ $(document).ready(function () {
 
     //Limpa os valores dos controles
     $("#limpar").click(function () {
+        // Reinicia variáveis
+        gamma_l = 0.01;
+        gamma_h = 1.0;
+        c = 0.0;
+        d0 = 30;
+
         //  Restaura o valor dos controles**
         document.getElementById("gamma_l").value = gamma_l;
         document.getElementById("gamma_h").value = gamma_h;
@@ -224,6 +262,7 @@ $(document).ready(function () {
     // Calcula o histograma e envia para o banco de dados juntamente com os valores selecionados
     $("#salvar").click(function (e) {
         e.preventDefault();
+
         // Calcula o histograma
         let channels = [0];
         let hist_size = [256];
@@ -235,8 +274,19 @@ $(document).ready(function () {
         vetor_imagem.push_back(dst);
 
         cv.calcHist(vetor_imagem, channels, mask, histograma, hist_size, ranges, acumulado);
-        console.log("histograma");
-        console.log(histograma.data32F);
+
+        // Escreve o JSON para enviar ao banco de dados
+        let string_data = JSON.stringify(histograma.data32F);
+        let controles = JSON.stringify(
+            {'gamma_l' : gamma_l, 'gamma_h' : gamma_h, 'c' : c, 'D0' : d0}
+        );
+
+        let dados = {
+            'histograma' : string_data,
+            'ajustes' : controles
+        }
+
+        console.log(dados);
     });
 
 });
