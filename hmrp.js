@@ -12,6 +12,7 @@ $(document).ready(function () {
     let huv;
     let fft_imagem;
     let imagem_filtrada;
+    let im_input;
 
     let gamma_l = 0.01;
     let gamma_h = 1.0;

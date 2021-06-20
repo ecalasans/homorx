@@ -12,6 +12,18 @@ $(document).ready(function (){
         }
 
         // Faz a requisição para o servidor
-        $.ajax()
-    })
+        $.ajax({
+            url: "http://localhost:8000/sysLogin/",
+            type: 'post',
+            datatype: 'json',
+            data: dados_login,
+            success: function (response) {
+                if (response.resposta === 'logado'){
+                    window.location.replace("http://localhost/homomorphic/sistema.html");
+                } else {
+                    alert('Você não tem acesso ao sistema!  Contacte o adminstrador.');
+                }
+            }
+        })
+    });
 });
