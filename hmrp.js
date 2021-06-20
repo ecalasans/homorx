@@ -208,6 +208,9 @@ $(document).ready(function () {
         // cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', imagem_filtrada);
     });
+
+    // Exibe o nome do usuário
+    $("#usuario").text("Olá, " + sessionStorage.getItem("usuario") + "!");
 /////////////////////////
 // BOTÕES
     //Abre a caixa de diálogo para selecionar imagem

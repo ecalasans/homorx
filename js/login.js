@@ -18,11 +18,11 @@ $(document).ready(function (){
             datatype: 'json',
             data: dados_login,
             success: function (response) {
-                if (response.resposta === 'logado'){
-                    window.location.replace("http://localhost/homomorphic/sistema.html");
-                } else {
-                    alert('Você não tem acesso ao sistema!  Contacte o adminstrador.');
-                }
+                sessionStorage.setItem("usuario", response.usuario);
+                window.location.replace("http://localhost/homomorphic/sistema.html");
+            },
+            error: function (response) {
+                alert("Erro de login:  verifique seus dados ou contacte o administrador");
             }
         })
     });
