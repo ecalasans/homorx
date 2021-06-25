@@ -303,7 +303,8 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: "http://localhost:8000/save_filter/",
+            // url: "http://localhost:8000/save_filter/",
+            url: "https://hmrxsys.redcaprn.org/save_filter/",
             type: 'post',
             datatype: 'json',
             data: filtragem,
