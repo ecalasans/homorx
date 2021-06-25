@@ -19,10 +19,11 @@ $(document).ready(function (){
             data: dados_login,
             success: function (response) {
                 sessionStorage.setItem("usuario", response.usuario);
+                sessionStorage.setItem("id_usuario", response.id_usuario);
                 window.location.replace("http://localhost/homomorphic/sistema.html");
             },
             error: function (response) {
-                alert("Erro de login:  verifique seus dados ou contacte o administrador");
+                alert("Sem contato com o servidor!  Tente mais tarde!");
             }
         })
     });

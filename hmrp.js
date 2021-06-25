@@ -51,7 +51,7 @@ $(document).ready(function () {
         fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        // cv.imshow('huv_canvas', huv);
+        cv.imshow('huv_canvas', temp_huv);
         cv.imshow('img_canvas', fft_imagem);
 
         // Atualiza valores das variáveis
@@ -61,7 +61,7 @@ $(document).ready(function () {
         d0 = d0_slider.value;
 
         // Limpa variáveis temporárias
-        temp_huv.delete();
+        //temp_huv.delete();
 
     });
 
@@ -83,7 +83,7 @@ $(document).ready(function () {
         fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        // cv.imshow('huv_canvas', huv);
+        cv.imshow('huv_canvas', temp_huv);
         cv.imshow('img_canvas', fft_imagem);
 
         // Atualiza valores das variáveis
@@ -93,7 +93,7 @@ $(document).ready(function () {
         d0 = d0_slider.value;
 
         // Limpa variáveis temporárias
-        temp_huv.delete();
+        //temp_huv.delete();
     });
 
     $("#c_slider").change(function () {
@@ -114,7 +114,7 @@ $(document).ready(function () {
         fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        // cv.imshow('huv_canvas', huv);
+        cv.imshow('huv_canvas', temp_huv);
         cv.imshow('img_canvas', fft_imagem);
 
         // Atualiza valores das variáveis
@@ -124,11 +124,10 @@ $(document).ready(function () {
         d0 = d0_slider.value;
 
         // Limpa variáveis temporárias
-        temp_huv.delete();
+        //temp_huv.delete();
     });
 
     $("#d0_slider").change(function () {
-        let d0 = this.value;
         let texto = "\\(D_{0} = " + d0 +"\\)";
         document.getElementById("d0_label").innerHTML = texto;
         MathJax.typeset();
@@ -146,17 +145,17 @@ $(document).ready(function () {
         fft_imagem = funcoes.ApplyHomomorphic(temp_huv, dst);
 
         //funcoes.CrossQuads(huv);
-        // cv.imshow('huv_canvas', huv);
+        cv.imshow('huv_canvas', temp_huv);
         cv.imshow('img_canvas', fft_imagem);
 
         // Atualiza valores das variáveis
+        d0 = d0_slider.value;
         gamma_l = gl_slider.value;
         gamma_h = gh_slider.value;
         c = c_slider.value;
-        d0 = d0_slider.value;
 
         // Limpa variáveis temporárias
-        temp_huv.delete();
+        //temp_huv.delete();
     });
 ///////////////////////////////
     $("#rx_input").change(function (e) {
@@ -205,12 +204,15 @@ $(document).ready(function () {
         fft_imagem = funcoes.MakeFFT(dst);
         imagem_filtrada = funcoes.ApplyHomomorphic(huv, dst);
 
-        // cv.imshow('huv_canvas', huv);
+        cv.imshow('huv_canvas', huv);
         cv.imshow('img_canvas', imagem_filtrada);
     });
 
+    console.log(sessionStorage);
+
     // Exibe o nome do usuário
     $("#usuario").text("Olá, " + sessionStorage.getItem("usuario") + "!");
+
 /////////////////////////
 // BOTÕES
     //Abre a caixa de diálogo para selecionar imagem
@@ -259,7 +261,7 @@ $(document).ready(function () {
 
         fft_imagem = funcoes.ApplyHomomorphic(huv, dst);
 
-        // cv.imshow('img_canvas', huv);
+        cv.imshow('img_canvas', huv);
         cv.imshow('img_canvas', fft_imagem);
     });
 
@@ -285,12 +287,42 @@ $(document).ready(function () {
             {'gamma_l' : gamma_l, 'gamma_h' : gamma_h, 'c' : c, 'D0' : d0}
         );
 
-        let dados = {
-            'histograma' : string_data,
-            'ajustes' : controles
+        // Captura o nome do arquivo
+        let rxinput = document.getElementById("rx_input");
+        let nome_arquivo = "";
+
+        if (rxinput.files.length > 0){
+            nome_arquivo = rxinput.files[0].name;
         }
 
-        console.log(dados);
+        let filtragem = {
+            'histograma' : string_data,
+            'ajustes' : controles,
+            'arquivo' : nome_arquivo,
+            'avaliador' : sessionStorage.getItem("id_usuario")
+        }
+
+        $.ajax({
+            url: "http://localhost:8000/save_filter/",
+            type: 'post',
+            datatype: 'json',
+            data: filtragem,
+            success: function (response) {
+                if (response.status === "salvo"){
+                    alert("Dados salvos no banco de dados com sucesso!");
+                } else {
+                    alert("Erro ao salvar os dados no servidor!  Tente novamente!");
+                }
+
+                // Apaga matrizes
+                vetor_imagem.delete();
+                histograma.delete();
+                mask.delete();
+            },
+            error: function (response) {
+                alert('Falha de comunicação com o servidor!');
+            }
+        });
     });
 
 ///////////////////////////

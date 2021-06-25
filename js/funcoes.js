@@ -292,7 +292,7 @@ function ApplyHomomorphic(huv, image) {
     let im_fft = new cv.Mat();
     cv.dft(prep_fft, im_fft, cv.DFT_COMPLEX_OUTPUT);
 
-
+    //CrossQuads(im_fft);
     // Faz a filtragem
     // let filt_re = new Array();
     // let filt_im = new Array();
