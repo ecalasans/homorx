@@ -280,9 +280,13 @@ $(document).ready(function () {
         vetor_imagem.push_back(dst);
 
         cv.calcHist(vetor_imagem, channels, mask, histograma, hist_size, ranges, acumulado);
+        let hist_norm = new cv.Mat();
+        cv.normalize(histograma, hist_norm, 0, 1, cv.NORM_MINMAX);
+
 
         // Escreve o JSON para enviar ao banco de dados
         let string_data = JSON.stringify(histograma.data32F);
+        console.log(string_data);
         let controles = JSON.stringify(
             {'gamma_l' : gamma_l, 'gamma_h' : gamma_h, 'c' : c, 'D0' : d0}
         );
@@ -303,8 +307,8 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            // url: "http://localhost:8000/save_filter/",
-            url: "https://hmrxsys.redcaprn.org/save_filter/",
+            url: "http://localhost:8000/save_filter/",
+            // url: "https://hmrxsys.redcaprn.org/save_filter/",
             type: 'post',
             datatype: 'json',
             data: filtragem,
