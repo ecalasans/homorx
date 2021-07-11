@@ -12,7 +12,7 @@ $(document).ready(function () {
     let huv;
     let fft_imagem;
     let imagem_filtrada;
-    let im_input;
+    let nome_arquivo;
 
     let gamma_l = 0.01;
     let gamma_h = 1.0;
@@ -161,6 +161,7 @@ $(document).ready(function () {
     $("#rx_input").change(function (e) {
         imagem = document.getElementById("img_container");
         imagem.src = URL.createObjectURL(e.target.files[0]);
+        nome_arquivo = e.target.files[0].name;
     });
 
     // Carrega a imagem ampliada
@@ -192,6 +193,7 @@ $(document).ready(function () {
     //Carrega a imagem via OpenCV
     $("#img_container").load(function () {
         mat = cv.imread(imagem);
+        $("#original").text(nome_arquivo);
         console.log("Dimensões da imagem original:  " + mat.rows, mat.cols);
         dst = new cv.Mat();
         cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY, 0);
@@ -285,7 +287,7 @@ $(document).ready(function () {
 
 
         // Escreve o JSON para enviar ao banco de dados
-        let string_data = JSON.stringify(histograma.data32F);
+        let string_data = JSON.stringify(hist_norm.data32F);
         console.log(string_data);
         let controles = JSON.stringify(
             {'gamma_l' : gamma_l, 'gamma_h' : gamma_h, 'c' : c, 'D0' : d0}
@@ -307,8 +309,8 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: "http://localhost:8000/save_filter/",
-            // url: "https://hmrxsys.redcaprn.org/save_filter/",
+            // url: "http://localhost:8000/save_filter/",
+            url: "https://hmrxsys.redcaprn.org/save_filter/",
             type: 'post',
             datatype: 'json',
             data: filtragem,
